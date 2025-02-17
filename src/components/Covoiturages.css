@@ -1,0 +1,848 @@
+.covoiturages-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.loading, .error, .no-results {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error {
+    color: #DC2626;
+}
+
+.search-info {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--background-color);
+    border-radius: var(--border-radius-md);
+}
+
+.trajets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.trajet-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 300px;
+    width: 100%;
+}
+
+.trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.trajet-route {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.trajet-date {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+.trajet-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.detail-text {
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+.trajet-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.trajet-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.voir-details {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.voir-details:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.tag-nouveau {
+    color: #F59E0B;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.tag-ecologique {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--primary-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.trajet-header h3 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.prix {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.trajet-info {
+    margin-bottom: 1.5rem;
+}
+
+.trajet-info p {
+    margin: 0.5rem 0;
+    color: var(--text-light);
+}
+
+.reserver-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.reserver-button:hover:not(:disabled) {
+    background: var(--secondary-color);
+}
+
+.reserver-button:disabled {
+    background: #E5E7EB;
+    cursor: not-allowed;
+}
+
+.search-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.search-section h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.search-section h2::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: var(--primary-color);
+    margin: 0.5rem auto;
+}
+
+.search-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--primary-color);
+}
+
+.search-button {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.search-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.trajets-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.trajet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.trajet-header h3 {
+    color: var(--text-color);
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.eco-badge {
+    background-color: #48bb78;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+}
+
+.trajet-info {
+    margin-bottom: 1.5rem;
+}
+
+.trajet-info p {
+    margin: 0.5rem 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note {
+    color: #f6ad55;
+    margin-left: 0.5rem;
+}
+
+.reserver-button {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.reserver-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.reserver-button:disabled {
+    background: #e2e8f0;
+    cursor: not-allowed;
+}
+
+.message {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.message.success {
+    background-color: #c6f6d5;
+    border: 1px solid #9ae6b4;
+    color: #276749;
+}
+
+.message.error {
+    background-color: #fed7d7;
+    border: 1px solid #feb2b2;
+    color: #9b2c2c;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .covoiturages-container {
+        margin: 1rem;
+    }
+
+    .search-section {
+        padding: 1.5rem;
+    }
+
+    .trajet-card {
+        margin: 0.5rem 0;
+    }
+
+    .search-form {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filtres-form {
+        grid-template-columns: 1fr;
+    }
+
+    .trajet-card {
+        padding: 1rem;
+    }
+
+    .trajet-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .trajet-actions {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+.chauffeur-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chauffeur-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chauffeur-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.chauffeur-details h3 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.etoiles {
+    color: var(--accent-color);
+}
+
+.note-valeur {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.trajet-details {
+    margin-bottom: 1.5rem;
+}
+
+.trajet-details p {
+    margin: 0.5rem 0;
+    color: var(--text-color);
+}
+
+.info-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label {
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.valeur {
+    font-weight: 500;
+}
+
+.ecologique {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.ecologique.oui {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.ecologique.non {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.detail-button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.detail-button:hover {
+    background-color: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+    .trajet-card {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .detail-button {
+        width: 100%;
+    }
+}
+
+.filters-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.filter-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+.filter-group input[type="number"],
+.filter-group select {
+    padding: 0.5rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.filter-group select {
+    background-color: white;
+    cursor: pointer;
+}
+
+.toggle-filtres {
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+}
+
+.filtres-avances {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.filtre-groupe {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filtre-groupe label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.filtre-groupe input {
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.filtre-groupe.checkbox {
+    flex-direction: row;
+    align-items: center;
+}
+
+.filtre-groupe.checkbox input {
+    margin-right: 0.5rem;
+}
+
+.eco-badge {
+    background: #D1FAE5;
+    color: #059669;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+    .filtres-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.confirmation-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+}
+
+.confirmation-content h3 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.confirmation-content p {
+    margin: 0.75rem 0;
+    color: var(--text-color);
+}
+
+.confirmation-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.confirm-button, .cancel-button {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.confirm-button {
+    background: var(--primary-color);
+    color: white;
+}
+
+.confirm-button:hover {
+    background: var(--secondary-color);
+}
+
+.cancel-button {
+    background: #e2e8f0;
+    color: var(--text-color);
+}
+
+.cancel-button:hover {
+    background: #cbd5e1;
+}
+
+.filtres-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.filtres-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.filtre-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filtre-group label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.filtre-group input {
+    padding: 0.75rem;
+    border: 2px solid #E5E7EB;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.filtre-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.filtre-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.trajets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.trajet-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 300px;
+    width: 100%;
+}
+
+.trajet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.conducteur-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.conducteur-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.note {
+    color: #F59E0B;
+    font-weight: 500;
+}
+
+.trajet-details {
+    border-top: 1px solid #E5E7EB;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.trajet-villes {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.badge-eco {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+.details-button {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.details-button:hover {
+    background: var(--secondary-color);
+}
+
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirmation-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 500px;
+    width: 90%;
+}
+
+.confirmation-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .filtres-form {
+        grid-template-columns: 1fr;
+    }
+
+    .trajets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .confirmation-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+} 

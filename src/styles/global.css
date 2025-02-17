@@ -1,0 +1,15 @@
+:root {
+    --primary-color: #22C55E;    /* Vert principal */
+    --secondary-color: #059669;  /* Vert foncé */
+    --accent-color: #10B981;     /* Vert clair */
+    --background-color: #F9FAFB; /* Gris très clair */
+    --text-color: #1F2937;       /* Texte foncé */
+    --error-color: #EF4444;      /* Rouge */
+    --success-color: #10B981;    /* Vert */
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+}

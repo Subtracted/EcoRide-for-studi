@@ -1,0 +1,15 @@
+.error-message {
+    background-color: #FEE2E2;
+    color: #DC2626;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background-color: #D1FAE5;
+    color: #059669;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+} 

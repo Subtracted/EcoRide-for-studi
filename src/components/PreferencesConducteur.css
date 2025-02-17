@@ -1,0 +1,163 @@
+.preferences-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preferences-container h2 {
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 1.75rem;
+}
+
+.preferences-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.preference-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding: 1.25rem;
+    border: 2px solid #E5E7EB;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preference-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.preference-item input[type="checkbox"] {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.preference-content {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-right: 2.5rem;
+}
+
+.preference-icon {
+    font-size: 1.5rem;
+    min-width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 0.5rem;
+}
+
+.preference-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.preference-title {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1.1rem;
+}
+
+.preference-description {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.save-button {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-button:hover:not(:disabled) {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.save-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.error-message,
+.success-message {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.error-message {
+    background-color: #FEE2E2;
+    color: #DC2626;
+    border: 1px solid #DC2626;
+}
+
+.success-message {
+    background-color: #D1FAE5;
+    color: #059669;
+    border: 1px solid #059669;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-color);
+    font-size: 1.1rem;
+}
+
+@media (max-width: 640px) {
+    .preferences-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .preferences-container h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .preferences-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .preference-item {
+        padding: 1rem;
+    }
+
+    .preference-icon {
+        font-size: 1.25rem;
+        min-width: 1.75rem;
+        height: 1.75rem;
+    }
+} 

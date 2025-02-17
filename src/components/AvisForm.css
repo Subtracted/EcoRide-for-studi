@@ -1,0 +1,91 @@
+.avis-form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.rating {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    cursor: pointer;
+    font-size: 2.5rem;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.rating label.active,
+.rating label:hover,
+.rating label:hover ~ label {
+    color: #ffd700;
+}
+
+.note-text {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    resize: vertical;
+    font-family: inherit;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.submit-button, .cancel-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.submit-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.submit-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.cancel-button {
+    background-color: #f3f4f6;
+    color: var(--text-color);
+}
+
+.cancel-button:hover {
+    background-color: #e5e7eb;
+}
+
+.error-message {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 1rem;
+} 

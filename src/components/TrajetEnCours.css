@@ -1,0 +1,94 @@
+.trajet-en-cours {
+    background: white;
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.status {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.status.en_attente {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.status.en_cours {
+    background-color: #DBEAFE;
+    color: #2563EB;
+}
+
+.status.termine {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.trajet-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.start-button, .end-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.end-button {
+    background-color: #DC2626;
+    color: white;
+}
+
+.start-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.end-button:hover {
+    background-color: #B91C1C;
+}
+
+.start-button:disabled, .end-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.cancel-button {
+    background-color: #EF4444;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+    background-color: #DC2626;
+}
+
+.cancel-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+} 

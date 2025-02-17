@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRide - Covoiturage Écologique</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>EcoRide</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Accueil</a></li>
+                    <li><a href="/covoiturages">Covoiturages</a></li>
+                    <li><a href="/connexion">Connexion</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="search-section">
+            <h2>Trouvez votre covoiturage</h2>
+            <form class="search-form">
+                <input type="text" placeholder="Ville de départ" required>
+                <input type="text" placeholder="Ville d'arrivée" required>
+                <input type="date" required>
+                <button type="submit">Rechercher</button>
+            </form>
+        </section>
+
+        <section class="presentation">
+            <h2>Pourquoi choisir EcoRide ?</h2>
+            <div class="presentation-grid">
+                <div class="presentation-card">
+                    <h3>Écologique</h3>
+                    <p>Réduisez votre empreinte carbone en partageant vos trajets</p>
+                    <img src="images/ecologique.jpg" alt="Illustration écologique" class="card-image">
+                </div>
+                <div class="presentation-card">
+                    <h3>Économique</h3>
+                    <p>Partagez les frais de transport avec d'autres voyageurs</p>
+                    <img src="images/economique.jpg" alt="Illustration économique" class="card-image">
+                </div>
+                <div class="presentation-card">
+                    <h3>Communautaire</h3>
+                    <p>Rejoignez une communauté de conducteurs et passagers responsables</p>
+                    <img src="images/communautaire.jpg" alt="Illustration communautaire" class="card-image">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>Contact : <a href="mailto:contact@ecoride.fr">contact@ecoride.fr</a></p>
+            <a href="/mentions-legales">Mentions légales</a>
+        </div>
+    </footer>
+</body>
+</html> 
