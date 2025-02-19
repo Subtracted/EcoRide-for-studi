@@ -7,10 +7,10 @@ const client = new MongoClient(uri);
 async function connectToMongo() {
     try {
         await client.connect();
-        console.log('✅ Connexion MongoDB réussie');
+        console.log(' Connexion MongoDB réussie');
         return client.db('ecoride');
     } catch (err) {
-        console.error('❌ Erreur connexion MongoDB:', err);
+        console.error(' Erreur connexion MongoDB:', err);
         throw err;
     }
 }

@@ -1,0 +1,29 @@
+{
+  "users": [
+    {
+      "email": "test@test.com",
+      "password": "test123",
+      "role": "utilisateur"
+    },
+    {
+      "email": "admin@ecoride.fr",
+      "password": "admin123",
+      "role": "admin"
+    }
+  ],
+  "trajets": [
+    // vos données de trajets
+  ],
+  "connection_logs": [
+    // Données exportées de connection_logs
+  ],
+  "daily_stats": [
+    // Données exportées de daily_stats
+  ],
+  "ecoride": [
+    // Données exportées de ecoride
+  ],
+  "trajet_logs": [
+    // Données exportées de trajet_logs
+  ]
+} 

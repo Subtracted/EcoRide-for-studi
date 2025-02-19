@@ -1,0 +1,11 @@
+[{
+  "_id": {
+    "$oid": "67b46d00b631bdeb9dbbcc6a"
+  },
+  "date": {
+    "$date": "2025-02-18T11:20:32.767Z"
+  },
+  "credits_earned": 2,
+  "reservations_count": 1,
+  "trajets_count": 1
+}]

@@ -54,6 +54,13 @@ CREATE DATABASE ecoride;
 psql -U postgres -d ecoride -f migrations/database.sql
 ```
 
+
+### Collections MongoDB
+- connection_logs : Logs de connexion des utilisateurs
+- daily_stats : Statistiques journalières
+- ecoride : Données principales
+- trajet_logs : Logs des trajets
+
 4. Configurer l'environnement
 ```bash
 # Copier le fichier d'exemple
@@ -70,11 +77,6 @@ JWT_SECRET=votre_secret
 ```bash
 npm start
 ```
-
-### Comptes de test
-- Utilisateur : test@test.com / test123
-- Admin : admin@ecoride.fr / admin123
-- Employé : employe@ecoride.fr / employe123
 
 
 ## Sécurité

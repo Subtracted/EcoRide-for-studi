@@ -1,0 +1,11 @@
+[{
+  "_id": {
+    "$oid": "67b46d00864acabf72cccf1e"
+  },
+  "trajetId": 1,
+  "userId": 1,
+  "action": "creation",
+  "timestamp": {
+    "$date": "2025-02-18T11:20:32.754Z"
+  }
+}]
