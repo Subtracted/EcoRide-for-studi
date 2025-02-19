@@ -88,12 +88,8 @@
     margin-left: auto;
 }
 
-.menu-toggle {
+.menu-button {
     display: none;
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
 }
 
 .menu-icon {
@@ -121,6 +117,10 @@
     transform: translateY(8px);
 }
 
+.menu-toggle {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .nav-content {
         position: relative;
@@ -130,7 +130,7 @@
         width: 100%;
     }
 
-    .menu-toggle {
+    .menu-button {
         display: block;
         position: relative;
         z-index: 2;
@@ -172,5 +172,9 @@
         margin: 0;
         width: 100%;
         justify-content: center;
+    }
+
+    .menu-toggle {
+        display: block;
     }
 } 

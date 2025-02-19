@@ -12,6 +12,10 @@ import GestionVehicules from './components/GestionVehicules';
 import AdminSpace from './components/AdminSpace';
 import EmployeSpace from './components/EmployeSpace';
 import PrivateRoute from './components/PrivateRoute';
+import Dashboard from './components/admin/Dashboard';
+import TrajetEnCours from './components/TrajetEnCours';
+import CompteSuspendu from './components/CompteSuspendu';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 import './styles/global.css';
 
@@ -25,27 +29,35 @@ function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/user-space" element={<UserSpace />} />
+                        <Route path="/compte-suspendu" element={<CompteSuspendu />} />
+                        <Route path="/mon-espace" element={
+                            <ProtectedRoute>
+                                <UserSpace />
+                            </ProtectedRoute>
+                        } />
                         <Route path="/saisir-voyage" element={<SaisirVoyage />} />
                         <Route path="/covoiturages" element={<Covoiturages />} />
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/gestion-vehicules" element={<GestionVehicules />} />
+                        <Route path="/admin" element={
+                            <ProtectedRoute requiredRole="admin">
+                                <AdminSpace />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/employe" element={
+                            <ProtectedRoute requiredRole="employe">
+                                <EmployeSpace />
+                            </ProtectedRoute>
+                        } />
                         <Route 
-                            path="/admin" 
+                            path="/admin/dashboard" 
                             element={
-                                <PrivateRoute role="admin">
-                                    <AdminSpace />
-                                </PrivateRoute>
+                                <ProtectedRoute requiredRole="admin">
+                                    <Dashboard />
+                                </ProtectedRoute>
                             } 
                         />
-                        <Route 
-                            path="/employe" 
-                            element={
-                                <PrivateRoute role="employe">
-                                    <EmployeSpace />
-                                </PrivateRoute>
-                            } 
-                        />
+                        <Route path="/covoiturage/:id" element={<TrajetEnCours />} />
                     </Routes>
                 </div>
             </Router>

@@ -1,0 +1,32 @@
+.compte-suspendu {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.message-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 500px;
+}
+
+.message-container h2 {
+    color: #dc2626;
+    margin-bottom: 1.5rem;
+}
+
+.contact-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.contact-link:hover {
+    text-decoration: underline;
+} 

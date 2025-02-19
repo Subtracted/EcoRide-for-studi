@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const LogService = require('../services/logService');
+const StatsService = require('../services/statsService');
 
 // Route pour obtenir tous les trajets
 router.get('/', async (req, res) => {
@@ -55,43 +57,61 @@ router.get('/search', async (req, res) => {
 // Route pour créer un trajet
 router.post('/', auth, async (req, res) => {
     try {
-        const { depart, arrivee, date_depart, places_totales, prix, est_ecologique, vehicule_id } = req.body;
-        const conducteur_id = req.user.id;
+        console.log('Données reçues:', req.body);
+        
+        const { 
+            depart, 
+            arrivee, 
+            date_depart,
+            date_arrivee,
+            prix,
+            places_totales,
+            vehicule_id,
+            est_ecologique,
+            commentaire 
+        } = req.body;
 
-        // Vérifier que le prix n'est pas trop élevé (max 18 crédits + 2 pour la plateforme)
-        if (prix > 18) {
-            return res.status(400).json({ 
-                message: 'Le prix ne peut pas dépasser 18 crédits (+ 2 crédits pour la plateforme)' 
+        // Validation des données
+        if (!depart || !arrivee || !date_depart || !prix || !places_totales || !vehicule_id) {
+            console.log('Données manquantes:', {
+                depart, arrivee, date_depart, prix, places_totales, vehicule_id
             });
+            return res.status(400).json({ message: 'Tous les champs requis doivent être remplis' });
         }
 
-        // Vérifier que le véhicule appartient bien à l'utilisateur
-        const vehicule = await pool.query(
-            'SELECT * FROM vehicules WHERE id = $1 AND conducteur_id = $2',
-            [vehicule_id, req.user.id]
+        const result = await pool.query(
+            `INSERT INTO trajets (
+                conducteur_id,
+                vehicule_id,
+                depart,
+                arrivee,
+                date_depart,
+                date_arrivee,
+                prix,
+                places_totales,
+                places_restantes,
+                est_ecologique,
+                commentaire
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8, $9, $10) 
+            RETURNING *`,
+            [
+                req.user.userId,
+                vehicule_id,
+                depart,
+                arrivee,
+                date_depart,
+                date_arrivee,
+                prix,
+                places_totales,
+                est_ecologique,
+                commentaire || ''
+            ]
         );
 
-        if (vehicule.rows.length === 0) {
-            return res.status(400).json({ message: 'Véhicule non trouvé ou non autorisé' });
-        }
-
-        // Vérifier que le nombre de places ne dépasse pas la capacité du véhicule
-        if (places_totales > vehicule.rows[0].places) {
-            return res.status(400).json({ 
-                message: `Le nombre de places ne peut pas dépasser la capacité du véhicule (${vehicule.rows[0].places} places)` 
-            });
-        }
-
-        const result = await pool.query(`
-            INSERT INTO trajets (
-                depart, arrivee, date_depart, places_totales, 
-                places_restantes, prix, est_ecologique, conducteur_id, vehicule_id
-            ) VALUES ($1, $2, $3, $4, $4, $5, $6, $7, $8) RETURNING *
-        `, [depart, arrivee, date_depart, places_totales, prix + 2, est_ecologique, conducteur_id, vehicule_id]);
-
+        console.log('Trajet créé:', result.rows[0]);
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        console.error(err);
+        console.error('Erreur création trajet:', err);
         res.status(500).json({ message: 'Erreur serveur' });
     }
 });
@@ -140,13 +160,48 @@ router.put('/:id/prix', auth, async (req, res) => {
 // Route pour obtenir les trajets d'un conducteur
 router.get('/conducteur', auth, async (req, res) => {
     try {
-        const result = await pool.query(
-            'SELECT * FROM trajets WHERE conducteur_id = $1 ORDER BY date_depart DESC',
-            [req.user.id]
+        console.log('Récupération des trajets pour conducteur:', req.user.userId);
+        
+        const result = await pool.query(`
+            SELECT t.*, 
+                   v.marque, v.modele,
+                   u.pseudo as conducteur_pseudo
+            FROM trajets t
+            JOIN vehicules v ON t.vehicule_id = v.id
+            JOIN utilisateurs u ON t.conducteur_id = u.id
+            WHERE t.conducteur_id = $1 
+            ORDER BY t.date_depart DESC`,
+            [req.user.userId]
         );
+
+        console.log('Trajets trouvés:', result.rows);
         res.json(result.rows);
     } catch (err) {
         console.error('Erreur récupération trajets conducteur:', err);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
+
+// Route pour obtenir un trajet spécifique
+router.get('/:id', auth, async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                t.*,
+                u.pseudo as conducteur_pseudo,
+                u.id as conducteur_id
+            FROM trajets t
+            JOIN utilisateurs u ON t.conducteur_id = u.id
+            WHERE t.id = $1
+        `, [req.params.id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Trajet non trouvé' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Erreur récupération trajet:', err);
         res.status(500).json({ message: 'Erreur serveur' });
     }
 });

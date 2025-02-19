@@ -3,8 +3,8 @@
     margin: 2rem auto;
     padding: 2rem;
     background: white;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .covoiturage-detail h2 {
@@ -14,9 +14,10 @@
 }
 
 .trajet-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
 }
 
 .trajet-header {
@@ -58,12 +59,9 @@
 }
 
 .reservation-section {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background-color: #F9FAFB;
-    border-radius: var(--border-radius-md);
-    position: relative;
-    z-index: 0;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
 }
 
 .places-selection {
@@ -89,16 +87,12 @@
 
 .reserver-button {
     width: 100%;
-    padding: 0.75rem;
-    background-color: var(--primary-color);
-    color: white;
+    padding: 1rem;
     border: none;
-    border-radius: var(--border-radius-md);
-    font-size: 1rem;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color var(--transition-normal);
-    position: relative;
-    z-index: 1;
+    background: var(--primary-color);
+    color: white;
 }
 
 .reserver-button:hover {
@@ -172,6 +166,20 @@
 
 .credits-info p {
     margin: 0.5rem 0;
+}
+
+.conducteur-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.conducteur-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 @media (max-width: 768px) {

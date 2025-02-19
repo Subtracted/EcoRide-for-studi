@@ -70,6 +70,11 @@
     background-color: var(--secondary-color);
 }
 
+.input-disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
     .contact-content {
         grid-template-columns: 1fr;

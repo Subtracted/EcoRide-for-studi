@@ -431,4 +431,147 @@
     .reservation-card {
         margin: 0.5rem 0;
     }
+}
+
+.trajets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.trajet-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.trajet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.trajet-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.status {
+    font-size: 0.9em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status.complet {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.trajet-details {
+    display: grid;
+    gap: 10px;
+}
+
+.trajet-details p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trajet-details i {
+    color: #666;
+    width: 20px;
+}
+
+.eco-badge {
+    margin-left: 8px;
+    font-size: 1.2em;
+}
+
+.trajet-commentaire {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Style général de l'espace utilisateur */
+.user-space {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* En-tête avec les informations de l'utilisateur */
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+/* Navigation par onglets */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    /* Pour plus tard: ajouter animation de transition */
+}
+
+.tab-button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-button.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Liste des trajets */
+.trajets-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Carte de trajet */
+.trajet-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* A faire: ajouter des animations au survol des cartes */
+
+/* Version mobile */
+@media (max-width: 768px) {
+    .user-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 } 

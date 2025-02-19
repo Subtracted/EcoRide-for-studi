@@ -7,6 +7,8 @@ const SaisirVoyage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [vehicules, setVehicules] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         depart: '',
         arrivee: '',
@@ -21,7 +23,6 @@ const SaisirVoyage = () => {
         commentaire: ''
     });
     const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
     const [prix, setPrix] = useState(10);
     const COMMISSION_PLATEFORME = 2;
 
@@ -31,18 +32,25 @@ const SaisirVoyage = () => {
             return;
         }
 
-        // Charger les véhicules de l'utilisateur
         const fetchVehicules = async () => {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules/mes-vehicules`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur chargement véhicules');
+                }
+                
                 const data = await response.json();
                 setVehicules(data);
             } catch (err) {
-                setError('Erreur lors du chargement des véhicules');
+                console.error('Erreur:', err);
+                setError('Impossible de charger vos véhicules');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -51,30 +59,54 @@ const SaisirVoyage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setMessage('');
+
         try {
+            // Créer un nouvel objet avec toutes les données, y compris le prix
+            const trajetData = {
+                ...formData,
+                prix: prix, // Ajout du prix depuis l'état
+                date_depart: `${formData.date_depart}T${formData.heure_depart}:00`,
+                date_arrivee: `${formData.date_arrivee}T${formData.heure_arrivee}:00`
+            };
+
+            console.log('Données envoyées:', trajetData);
+
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/trajets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({
-                    ...formData,
-                    date_depart: `${formData.date_depart}T${formData.heure_depart}`,
-                    date_arrivee: `${formData.date_arrivee}T${formData.heure_arrivee}`
-                })
+                body: JSON.stringify(trajetData)
             });
 
             const data = await response.json();
+            console.log('Réponse du serveur:', data);
 
-            if (response.ok) {
-                setMessage('Trajet créé avec succès !');
-                setTimeout(() => navigate('/user-space'), 2000);
-            } else {
-                setError(data.message || 'Erreur lors de la création du trajet');
+            if (!response.ok) {
+                throw new Error(data.message || 'Erreur lors de la création du trajet');
             }
+
+            setMessage('Trajet créé avec succès !');
+            // Réinitialiser le formulaire
+            setFormData({
+                depart: '',
+                arrivee: '',
+                date_depart: '',
+                heure_depart: '',
+                date_arrivee: '',
+                heure_arrivee: '',
+                places_totales: '',
+                vehicule_id: '',
+                est_ecologique: false,
+                commentaire: ''
+            });
+            setPrix(10); // Réinitialiser le prix
         } catch (err) {
-            setError('Erreur de connexion au serveur');
+            console.error('Erreur:', err);
+            setError(err.message);
         }
     };
 
@@ -229,7 +261,7 @@ const SaisirVoyage = () => {
                         <option value="">Sélectionnez un véhicule</option>
                         {vehicules.map(vehicule => (
                             <option key={vehicule.id} value={vehicule.id}>
-                                {vehicule.marque} {vehicule.modele} - {vehicule.immatriculation}
+                                {vehicule.marque} {vehicule.modele} ({vehicule.annee})
                             </option>
                         ))}
                     </select>

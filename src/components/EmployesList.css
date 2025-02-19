@@ -1,0 +1,55 @@
+.employes-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.employe-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.employe-info h4 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.employe-info p {
+    margin: 0.5rem 0;
+    color: #666;
+}
+
+.status {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.status.actif {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.status.suspendu {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.suspend-button {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #f3f4f6;
+    color: #dc2626;
+}
+
+.suspend-button.active {
+    background: #dc2626;
+    color: white;
+} 

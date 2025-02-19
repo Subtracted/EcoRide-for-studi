@@ -5,87 +5,87 @@ const auth = require('../middleware/auth');
 
 // Créer une réservation
 router.post('/', auth, async (req, res) => {
+    const client = await pool.connect();
+    
     try {
-        const { trajet_id } = req.body;
-        const passager_id = req.user.id;
+        await client.query('BEGIN');
+        
+        const { trajetId } = req.body;
+        const userId = req.user.userId;
 
-        // Vérifier le trajet et son prix
-        const trajet = await pool.query(
-            'SELECT t.*, u.credits as conducteur_credits FROM trajets t JOIN utilisateurs u ON t.conducteur_id = u.id WHERE t.id = $1',
-            [trajet_id]
+        // Vérifier que l'utilisateur n'est pas le conducteur
+        const trajetResult = await client.query(
+            'SELECT * FROM trajets WHERE id = $1',
+            [trajetId]
         );
 
-        if (trajet.rows.length === 0) {
-            return res.status(404).json({ message: 'Trajet non trouvé' });
+        if (trajetResult.rows.length === 0) {
+            throw new Error('Trajet non trouvé');
         }
 
-        // Vérifier les crédits de l'utilisateur
-        const user = await pool.query(
+        const trajet = trajetResult.rows[0];
+
+        // Empêcher le conducteur de réserver son propre trajet
+        if (trajet.conducteur_id === userId) {
+            throw new Error('Vous ne pouvez pas réserver votre propre trajet');
+        }
+
+        // Vérifier les places
+        if (trajet.places_restantes <= 0) {
+            throw new Error('Plus de places disponibles');
+        }
+
+        // Vérifier les crédits
+        const userResult = await client.query(
             'SELECT credits FROM utilisateurs WHERE id = $1',
-            [passager_id]
+            [userId]
         );
 
-        console.log('Détails de la réservation:');
-        console.log('- Credits utilisateur:', user.rows[0].credits);
-        console.log('- Prix trajet:', trajet.rows[0].prix);
-        console.log('- Places restantes:', trajet.rows[0].places_restantes);
-
-        if (user.rows[0].credits < trajet.rows[0].prix) {
-            return res.status(400).json({ 
-                message: 'Crédits insuffisants',
-                credits_actuels: user.rows[0].credits,
-                credits_necessaires: trajet.rows[0].prix
-            });
+        if (userResult.rows[0].credits < trajet.prix) {
+            throw new Error('Crédits insuffisants');
         }
-
-        // Vérifier les places disponibles
-        if (trajet.rows[0].places_restantes < 1) {
-            return res.status(400).json({ message: 'Plus de places disponibles' });
-        }
-
-        // Commencer la transaction
-        await pool.query('BEGIN');
 
         // Créer la réservation
-        await pool.query(
-            'INSERT INTO reservations (passager_id, trajet_id) VALUES ($1, $2)',
-            [passager_id, trajet_id]
+        await client.query(
+            'INSERT INTO reservations (trajet_id, utilisateur_id, statut) VALUES ($1, $2, $3)',
+            [trajetId, userId, 'confirmé']
         );
 
         // Mettre à jour les places
-        await pool.query(
+        await client.query(
             'UPDATE trajets SET places_restantes = places_restantes - 1 WHERE id = $1',
-            [trajet_id]
+            [trajetId]
         );
 
-        // Déduire les crédits du passager
-        await pool.query(
+        // Mettre à jour les crédits
+        await client.query(
             'UPDATE utilisateurs SET credits = credits - $1 WHERE id = $2',
-            [trajet.rows[0].prix, passager_id]
+            [trajet.prix, userId]
         );
 
-        // Ajouter les crédits au conducteur (prix - 2 crédits pour la plateforme)
-        await pool.query(
+        // Ajouter les crédits au conducteur
+        await client.query(
             'UPDATE utilisateurs SET credits = credits + $1 WHERE id = $2',
-            [trajet.rows[0].prix - 2, trajet.rows[0].conducteur_id]
+            [trajet.prix - 2, trajet.conducteur_id] // -2 pour les frais de plateforme
         );
 
-        // Ajouter les crédits à la plateforme (table credits_plateforme)
-        await pool.query(
-            'INSERT INTO credits_plateforme (montant, trajet_id) VALUES ($1, $2)',
-            [2, trajet_id]
-        );
-
-        await pool.query('COMMIT');
-
-        res.status(201).json({ 
+        await client.query('COMMIT');
+        
+        res.json({ 
             message: 'Réservation effectuée avec succès',
-            credits_restants: user.rows[0].credits - trajet.rows[0].prix
+            reservation: {
+                trajetId,
+                prix: trajet.prix,
+                placesRestantes: trajet.places_restantes - 1
+            }
         });
+
     } catch (err) {
-        await pool.query('ROLLBACK');
+        await client.query('ROLLBACK');
         console.error('Erreur réservation:', err);
-        res.status(500).json({ message: 'Erreur serveur' });
+        res.status(500).json({ message: err.message });
+    } finally {
+        client.release();
     }
 });
 

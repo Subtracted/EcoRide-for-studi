@@ -6,7 +6,7 @@ import './UserSpace.css';
 
 const UserSpace = () => {
     const [reservations, setReservations] = useState([]);
-    const [trajets, setTrajets] = useState([]);
+    const [mesTrajets, setMesTrajets] = useState([]);
     const [activeTab, setActiveTab] = useState('trajets');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -40,7 +40,7 @@ const UserSpace = () => {
                 ]);
 
                 setReservations(reservationsData);
-                setTrajets(trajetsData);
+                setMesTrajets(trajetsData);
             } catch (err) {
                 setError('Erreur lors du chargement des données');
             } finally {
@@ -85,7 +85,7 @@ const UserSpace = () => {
                     {activeTab === 'trajets' && (
                         <div className="trajets-list">
                             <h3>Mes trajets proposés</h3>
-                            {trajets.length === 0 ? (
+                            {mesTrajets.length === 0 ? (
                                 <p className="empty-message">
                                     Vous n'avez pas encore proposé de trajets.
                                     <button 
@@ -97,12 +97,43 @@ const UserSpace = () => {
                                 </p>
                             ) : (
                                 <div className="trajets-grid">
-                                    {trajets.map(trajet => (
+                                    {mesTrajets.map(trajet => (
                                         <div key={trajet.id} className="trajet-card">
-                                            <h4>{trajet.depart} → {trajet.arrivee}</h4>
-                                            <p>Date : {new Date(trajet.date_depart).toLocaleString()}</p>
-                                            <p>Places : {trajet.places_restantes}/{trajet.places_totales}</p>
-                                            <p>Prix : {trajet.prix}€</p>
+                                            <div className="trajet-header">
+                                                <h4>{trajet.depart} → {trajet.arrivee}</h4>
+                                                <span className={`status ${trajet.places_restantes === 0 ? 'complet' : ''}`}>
+                                                    {trajet.places_restantes === 0 ? 'Complet' : `${trajet.places_restantes} places disponibles`}
+                                                </span>
+                                            </div>
+                                            <div className="trajet-details">
+                                                <p>
+                                                    <i className="fas fa-calendar"></i> 
+                                                    {new Date(trajet.date_depart).toLocaleDateString('fr-FR')}
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-clock"></i> 
+                                                    {new Date(trajet.date_depart).toLocaleTimeString('fr-FR', { 
+                                                        hour: '2-digit', 
+                                                        minute: '2-digit' 
+                                                    })}
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-car"></i> 
+                                                    {trajet.marque} {trajet.modele}
+                                                    {trajet.est_ecologique && 
+                                                        <span className="eco-badge" title="Véhicule écologique">🌱</span>
+                                                    }
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-euro-sign"></i> 
+                                                    {trajet.prix} crédits
+                                                </p>
+                                            </div>
+                                            {trajet.commentaire && (
+                                                <div className="trajet-commentaire">
+                                                    <i className="fas fa-comment"></i> {trajet.commentaire}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

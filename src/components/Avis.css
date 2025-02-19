@@ -1,10 +1,9 @@
 .avis-container {
     background: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 2rem auto;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 2rem;
 }
 
 .avis-container h3 {
@@ -35,17 +34,13 @@
 .star {
     background: none;
     border: none;
-    font-size: 2rem;
-    color: #D1D5DB;
+    font-size: 1.5rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0.25rem;
+    color: #d1d5db;
 }
 
-.star:hover,
 .star.active {
-    color: #F59E0B;
-    transform: scale(1.1);
+    color: #fbbf24;
 }
 
 .points-section {
@@ -119,32 +114,20 @@
 
 textarea {
     width: 100%;
-    padding: 1rem;
-    border: 2px solid #E5E7EB;
-    border-radius: 0.5rem;
+    min-height: 100px;
+    padding: 0.8rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
     resize: vertical;
-    min-height: 120px;
-    font-family: inherit;
-    transition: all 0.3s ease;
-}
-
-textarea:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
 }
 
 .submit-button {
-    width: 100%;
     background: var(--primary-color);
     color: white;
-    padding: 1rem;
+    padding: 0.8rem;
     border: none;
-    border-radius: 0.5rem;
-    font-size: 1.1rem;
-    font-weight: 500;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -176,6 +159,16 @@ textarea:focus {
     background-color: #D1FAE5;
     color: #059669;
     border: 1px solid #059669;
+}
+
+.avis-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.rating {
+    display: flex;
+    gap: 0.5rem;
 }
 
 @media (max-width: 640px) {

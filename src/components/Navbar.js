@@ -48,6 +48,14 @@ const Navbar = () => {
                             Rechercher
                         </Link>
                     </li>
+                    <li>
+                        <Link 
+                            to="/contact" 
+                            className={location.pathname === '/contact' ? 'active' : ''}
+                        >
+                            Contact
+                        </Link>
+                    </li>
                     {user && (
                         <>
                             <li>
@@ -60,8 +68,8 @@ const Navbar = () => {
                             </li>
                             <li>
                                 <Link 
-                                    to="/user-space" 
-                                    className={location.pathname === '/user-space' ? 'active' : ''}
+                                    to="/mon-espace" 
+                                    className={location.pathname === '/mon-espace' ? 'active' : ''}
                                 >
                                     Mon espace
                                 </Link>

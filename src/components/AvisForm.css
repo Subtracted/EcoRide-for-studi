@@ -88,4 +88,68 @@ textarea {
     padding: 0.75rem;
     border-radius: var(--border-radius-sm);
     margin-bottom: 1rem;
+}
+
+.avis-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 1rem 0;
+}
+
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 0.5rem;
+}
+
+.star {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star.active {
+    color: #fbbf24;
+}
+
+.star:hover,
+.star:hover ~ .star {
+    color: #fbbf24;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    resize: vertical;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background: var(--primary-color-dark);
 } 

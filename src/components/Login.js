@@ -11,7 +11,7 @@ const Login = () => {
     // État local pour le formulaire
     const [formData, setFormData] = useState({
         email: '',
-        mot_de_passe: ''
+        password: ''
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -34,17 +34,19 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Vérification basique des champs
-        if (!formData.email || !formData.mot_de_passe) {
-            setError('Tous les champs sont requis');
-            return;
-        }
-
         try {
-            await login(formData.email, formData.mot_de_passe);
-            navigate('/');
+            const result = await login({
+                email: formData.email,
+                password: formData.password
+            });
+
+            if (result.success) {
+                navigate('/mon-espace');
+            } else {
+                setError(result.error);
+            }
         } catch (err) {
-            setError('Email ou mot de passe incorrect');
+            setError('Erreur de connexion');
         }
     };
 
@@ -70,8 +72,8 @@ const Login = () => {
                     <label>Mot de passe</label>
                     <input
                         type="password"
-                        name="mot_de_passe"
-                        value={formData.mot_de_passe}
+                        name="password"
+                        value={formData.password}
                         onChange={handleChange}
                         required
                     />

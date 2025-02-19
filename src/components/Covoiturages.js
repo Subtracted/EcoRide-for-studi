@@ -6,10 +6,10 @@ import './Covoiturages.css';
 const Covoiturages = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [trajets, setTrajets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const [filtres, setFiltres] = useState({
         estEcologique: false,
@@ -20,10 +20,57 @@ const Covoiturages = () => {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [selectedTrajet, setSelectedTrajet] = useState(null);
 
-    // Récupérer les paramètres de recherche
-    const depart = searchParams.get('depart');
-    const arrivee = searchParams.get('arrivee');
-    const date = searchParams.get('date');
+    const fetchTrajets = async (params = {}) => {
+        try {
+            setLoading(true);
+            
+            // Construire l'URL avec les paramètres de recherche
+            const queryParams = new URLSearchParams();
+            if (params.depart) queryParams.append('depart', params.depart);
+            if (params.arrivee) queryParams.append('arrivee', params.arrivee);
+            if (params.date) queryParams.append('date', params.date);
+            if (params.prix_max) queryParams.append('prix_max', params.prix_max);
+            if (params.est_ecologique) queryParams.append('est_ecologique', 'true');
+
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/api/trajets/search?${queryParams}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la recherche des trajets');
+            }
+
+            const data = await response.json();
+            setTrajets(data);
+        } catch (err) {
+            console.error('Erreur:', err);
+            setError('Impossible de charger les trajets');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTrajets();
+    }, []);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        fetchTrajets(searchParams);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setSearchParams(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
 
     const handleFiltreChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -45,35 +92,6 @@ const Covoiturages = () => {
             return true;
         });
     };
-
-    useEffect(() => {
-        const fetchTrajets = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(
-                    `${process.env.REACT_APP_API_URL}/api/trajets/search?` + 
-                    new URLSearchParams({
-                        depart,
-                        arrivee,
-                        date
-                    })
-                );
-                
-                if (!response.ok) throw new Error('Erreur lors de la recherche');
-                
-                const data = await response.json();
-                setTrajets(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (depart && arrivee && date) {
-            fetchTrajets();
-        }
-    }, [depart, arrivee, date]);
 
     const trajetsFiltres = filtrerTrajets(trajets);
 
@@ -105,9 +123,11 @@ const Covoiturages = () => {
                 const updatedResponse = await fetch(
                     `${process.env.REACT_APP_API_URL}/api/trajets/search?` + 
                     new URLSearchParams({
-                        depart,
-                        arrivee,
-                        date
+                        depart: searchParams.get('depart'),
+                        arrivee: searchParams.get('arrivee'),
+                        date: searchParams.get('date'),
+                        prix_max: searchParams.get('prix_max'),
+                        est_ecologique: searchParams.get('est_ecologique')
                     })
                 );
                 const updatedData = await updatedResponse.json();
@@ -125,114 +145,125 @@ const Covoiturages = () => {
 
     return (
         <div className="covoiturages-container">
-            <section className="filtres-section">
-                <h2>Filtres</h2>
-                <div className="filtres-form">
-                    <label className="filtre-checkbox">
-                        <input
-                            type="checkbox"
-                            name="estEcologique"
-                            checked={filtres.estEcologique}
-                            onChange={handleFiltreChange}
-                        />
-                        Voyages écologiques uniquement
-                    </label>
+            <h2>Rechercher un trajet</h2>
 
-                    <div className="filtre-group">
-                        <label>Prix maximum (€)</label>
+            <form onSubmit={handleSearch} className="search-form">
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Départ</label>
                         <input
-                            type="number"
-                            name="prixMax"
-                            value={filtres.prixMax}
-                            onChange={handleFiltreChange}
-                            min="0"
+                            type="text"
+                            name="depart"
+                            value={searchParams.get('depart') || ''}
+                            onChange={handleInputChange}
+                            placeholder="Ville de départ"
                         />
                     </div>
 
-                    <div className="filtre-group">
-                        <label>Durée maximum (heures)</label>
+                    <div className="form-group">
+                        <label>Arrivée</label>
                         <input
-                            type="number"
-                            name="dureeMax"
-                            value={filtres.dureeMax}
-                            onChange={handleFiltreChange}
-                            min="0"
+                            type="text"
+                            name="arrivee"
+                            value={searchParams.get('arrivee') || ''}
+                            onChange={handleInputChange}
+                            placeholder="Ville d'arrivée"
                         />
                     </div>
 
-                    <div className="filtre-group">
-                        <label>Note minimum du conducteur</label>
+                    <div className="form-group">
+                        <label>Date</label>
+                        <input
+                            type="date"
+                            name="date"
+                            value={searchParams.get('date') || ''}
+                            onChange={handleInputChange}
+                            min={new Date().toISOString().split('T')[0]}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Prix maximum</label>
                         <input
                             type="number"
-                            name="noteMin"
-                            value={filtres.noteMin}
-                            onChange={handleFiltreChange}
+                            name="prix_max"
+                            value={searchParams.get('prix_max') || ''}
+                            onChange={handleInputChange}
                             min="0"
-                            max="5"
-                            step="0.5"
+                            placeholder="Prix max en crédits"
                         />
+                    </div>
+
+                    <div className="form-group checkbox">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="est_ecologique"
+                                checked={searchParams.get('est_ecologique') === 'true'}
+                                onChange={handleInputChange}
+                            />
+                            Trajets écologiques uniquement
+                        </label>
                     </div>
                 </div>
-            </section>
 
-            <section className="resultats-section">
-                {loading ? (
-                    <div className="loading">Recherche des trajets...</div>
-                ) : error ? (
-                    <div className="error">{error}</div>
-                ) : trajetsFiltres.length === 0 ? (
-                    <div className="no-results">
-                        <p>Aucun trajet disponible pour votre recherche.</p>
-                        {trajets.length > 0 && (
-                            <p>Essayez de modifier vos filtres ou choisissez une autre date.</p>
-                        )}
-                    </div>
-                ) : (
-                    <div className="trajets-grid">
-                        {trajetsFiltres.map(trajet => (
-                            <div key={trajet.id} className="trajet-card">
-                                <div className="conducteur-info">
-                                    <img 
-                                        src={trajet.photo_conducteur || '/images/default-avatar.png'} 
-                                        alt={trajet.pseudo_conducteur}
-                                        className="conducteur-photo"
-                                    />
-                                    <div>
-                                        <h3>{trajet.pseudo_conducteur}</h3>
-                                        <div className="note">
-                                            ★ {trajet.note_conducteur ? trajet.note_conducteur.toFixed(1) : 'Nouveau'}
-                                        </div>
-                                    </div>
-                                </div>
+                <button type="submit" className="search-button">
+                    Rechercher
+                </button>
+            </form>
 
-                                <div className="trajet-details">
-                                    <p className="trajet-villes">
-                                        {trajet.depart} → {trajet.arrivee}
-                                    </p>
-                                    <p className="trajet-horaires">
-                                        {new Date(trajet.date_depart).toLocaleString()} →
-                                        {new Date(trajet.date_arrivee).toLocaleString()}
-                                    </p>
-                                    <p className="places">
-                                        Places disponibles : {trajet.places_restantes}
-                                    </p>
-                                    <p className="prix">{trajet.prix}€</p>
-                                    {trajet.est_ecologique && (
-                                        <span className="badge-eco">Écologique</span>
-                                    )}
-                                </div>
-
-                                <button 
-                                    onClick={() => navigate(`/covoiturage/${trajet.id}`)}
-                                    className="details-button"
-                                >
-                                    Voir les détails
-                                </button>
+            {loading ? (
+                <div className="loading">Chargement...</div>
+            ) : error ? (
+                <div className="error">{error}</div>
+            ) : trajetsFiltres.length === 0 ? (
+                <div className="no-results">Aucun trajet trouvé</div>
+            ) : (
+                <div className="trajets-grid">
+                    {trajetsFiltres.map(trajet => (
+                        <div key={trajet.id} className="trajet-card">
+                            <div className="trajet-header">
+                                <h4>{trajet.depart} → {trajet.arrivee}</h4>
+                                <span className={`status ${trajet.places_restantes === 0 ? 'complet' : ''}`}>
+                                    {trajet.places_restantes === 0 ? 'Complet' : `${trajet.places_restantes} places`}
+                                </span>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </section>
+                            <div className="trajet-details">
+                                <p>
+                                    <i className="fas fa-calendar"></i>
+                                    {new Date(trajet.date_depart).toLocaleDateString('fr-FR')}
+                                </p>
+                                <p>
+                                    <i className="fas fa-clock"></i>
+                                    {new Date(trajet.date_depart).toLocaleTimeString('fr-FR', {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </p>
+                                <p>
+                                    <i className="fas fa-user"></i>
+                                    {trajet.conducteur_pseudo}
+                                </p>
+                                <p>
+                                    <i className="fas fa-euro-sign"></i>
+                                    {trajet.prix} crédits
+                                </p>
+                            </div>
+                            {trajet.commentaire && (
+                                <div className="trajet-commentaire">
+                                    <i className="fas fa-comment"></i> {trajet.commentaire}
+                                </div>
+                            )}
+                            <button 
+                                onClick={() => navigate(`/covoiturage/${trajet.id}`)}
+                                className="details-button"
+                            >
+                                Voir les détails
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {showConfirmation && (
                 <div className="confirmation-modal">

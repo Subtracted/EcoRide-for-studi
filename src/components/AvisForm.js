@@ -1,93 +1,84 @@
 import React, { useState } from 'react';
 import './AvisForm.css';
 
-const AvisForm = ({ reservation, onSubmit, onClose }) => {
-    const [note, setNote] = useState(5);
-    const [commentaire, setCommentaire] = useState('');
-    const [error, setError] = useState(null);
+const AvisForm = ({ trajetId, onSubmit }) => {
+    const [formData, setFormData] = useState({
+        note: 5,
+        commentaire: ''
+    });
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const requestData = {
-                reservation_id: reservation.id,
-                note,
-                commentaire
-            };
-            console.log('Données envoyées:', requestData);
-            console.log('URL:', `${process.env.REACT_APP_API_URL}/api/avis`);
-            console.log('Token:', localStorage.getItem('token'));
+        setError('');
+        setSuccess('');
 
+        try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/avis`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify(requestData)
+                body: JSON.stringify({
+                    trajetId,
+                    ...formData
+                })
             });
 
-            console.log('Status de la réponse:', response.status);
-            const responseText = await response.text();
-            console.log('Réponse brute:', responseText);
-
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (err) {
-                console.error('Erreur parsing JSON:', err);
-                throw new Error('Réponse invalide du serveur');
-            }
-
             if (!response.ok) {
-                throw new Error(data.message || 'Erreur lors de la soumission de l\'avis');
+                const error = await response.json();
+                throw new Error(error.message);
             }
 
-            await onSubmit();
-            onClose();
+            setSuccess('Avis envoyé avec succès ! Il sera visible après validation.');
+            setFormData({ note: 5, commentaire: '' });
+            if (onSubmit) onSubmit();
         } catch (err) {
-            console.error('Erreur lors de l\'envoi:', err);
-            setError(err.message);
+            setError(err.message || 'Erreur lors de l\'envoi de l\'avis');
         }
     };
 
     return (
-        <div className="avis-form-container">
-            <h3>Noter le conducteur</h3>
+        <div className="avis-form">
+            <h3>Donner votre avis</h3>
+            
             {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+
             <form onSubmit={handleSubmit}>
-                <div className="rating">
-                    {[1, 2, 3, 4, 5].map((value) => (
-                        <label key={value} className={note >= value ? 'active' : ''}>
-                            <input
-                                type="radio"
-                                name="rating"
-                                value={value}
-                                checked={note === value}
-                                onChange={(e) => {
-                                    const newNote = Number(e.target.value);
-                                    console.log('Nouvelle note:', newNote);
-                                    setNote(newNote);
-                                }}
-                            />
-                            ★
-                        </label>
-                    ))}
+                <div className="form-group">
+                    <label>Note</label>
+                    <div className="rating">
+                        {[5, 4, 3, 2, 1].map((note) => (
+                            <button
+                                key={note}
+                                type="button"
+                                className={`star ${formData.note >= note ? 'active' : ''}`}
+                                onClick={() => setFormData({ ...formData, note })}
+                            >
+                                ★
+                            </button>
+                        ))}
+                    </div>
                 </div>
-                <div className="note-text">Note : {note}/5</div>
-                <textarea
-                    placeholder="Votre commentaire (optionnel)"
-                    value={commentaire}
-                    onChange={(e) => setCommentaire(e.target.value)}
-                />
-                <div className="buttons">
-                    <button type="submit" className="submit-button">
-                        Envoyer
-                    </button>
-                    <button type="button" className="cancel-button" onClick={onClose}>
-                        Annuler
-                    </button>
+
+                <div className="form-group">
+                    <label>Commentaire</label>
+                    <textarea
+                        value={formData.commentaire}
+                        onChange={(e) => setFormData({ ...formData, commentaire: e.target.value })}
+                        required
+                        minLength={10}
+                        placeholder="Partagez votre expérience (minimum 10 caractères)"
+                        rows={4}
+                    />
                 </div>
+
+                <button type="submit" className="submit-button">
+                    Envoyer l'avis
+                </button>
             </form>
         </div>
     );

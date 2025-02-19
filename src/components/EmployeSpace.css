@@ -1,7 +1,7 @@
 .employe-space {
     max-width: 1200px;
-    margin: 2rem auto;
-    padding: 2rem;
+    margin: 20px auto;
+    padding: 20px;
 }
 
 .employe-space h2 {
@@ -65,34 +65,16 @@
 
 .avis-actions {
     display: flex;
-    gap: 0.75rem;
-}
-
-.btn-valider, .btn-refuser {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    gap: 10px;
 }
 
 .btn-valider {
-    background: #D1FAE5;
-    color: #059669;
-}
-
-.btn-refuser {
-    background: #FEE2E2;
-    color: #DC2626;
-}
-
-.btn-valider:hover {
-    background: #059669;
+    background: var(--primary-color);
     color: white;
 }
 
-.btn-refuser:hover {
-    background: #DC2626;
+.btn-refuser {
+    background: #ef4444;
     color: white;
 }
 
@@ -158,6 +140,24 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Tableau des avis */
+.avis-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.avis-table th,
+.avis-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
     .employe-space {
         padding: 1rem;
@@ -170,5 +170,10 @@
 
     .participants {
         grid-template-columns: 1fr;
+    }
+
+    .avis-table {
+        display: block;
+        overflow-x: auto;
     }
 } 
