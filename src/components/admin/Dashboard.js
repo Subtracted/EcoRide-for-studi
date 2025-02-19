@@ -21,28 +21,38 @@ ChartJS.register(
     Legend
 );
 
+/**
+ * Tableau de bord administrateur
+ * Affiche les statistiques globales et les actions rapides
+ */
 const Dashboard = () => {
-    const [dashboardData, setDashboardData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // État pour les données du tableau de bord
+    const [dashboardData, setDashboardData] = useState({
+        totalUsers: 0,
+        totalTrajets: 0,
+        totalCredits: 0,
+        recentActivities: []
+    });
+
+    /**
+     * Charge les données du tableau de bord
+     */
+    const loadDashboardData = async () => {
+        try {
+            const response = await fetch('/api/admin/dashboard', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            setDashboardData(data);
+        } catch (err) {
+            console.error('Erreur chargement dashboard:', err);
+        }
+    };
 
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const response = await fetch('/api/admin/dashboard', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                const data = await response.json();
-                setDashboardData(data);
-            } catch (err) {
-                console.error('Erreur chargement dashboard:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDashboardData();
+        loadDashboardData();
     }, []);
 
     if (loading) return <div>Chargement...</div>;

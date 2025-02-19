@@ -24,6 +24,11 @@ ChartJS.register(
     Legend
 );
 
+/**
+ * Espace d'administration
+ * Interface pour les administrateurs permettant de gérer les utilisateurs,
+ * les trajets et les statistiques
+ */
 const AdminSpace = () => {
     const [activeTab, setActiveTab] = useState('stats');
     const [stats, setStats] = useState({
@@ -35,6 +40,9 @@ const AdminSpace = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    /**
+     * Charge les statistiques au montage du composant
+     */
     useEffect(() => {
         fetchData();
     }, []);

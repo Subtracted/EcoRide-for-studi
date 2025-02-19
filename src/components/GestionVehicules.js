@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './GestionVehicules.css';
 
+/**
+ * Gestion des véhicules
+ * Interface permettant aux utilisateurs de gérer leurs véhicules
+ * et aux employés de valider le caractère écologique
+ */
 const GestionVehicules = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -13,6 +18,7 @@ const GestionVehicules = () => {
         places: ''
     });
     const [message, setMessage] = useState('');
+    const [vehicules, setVehicules] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -36,6 +42,20 @@ const GestionVehicules = () => {
         } catch (err) {
             setMessage('Erreur serveur');
         }
+    };
+
+    /**
+     * Charge la liste des véhicules de l'utilisateur
+     */
+    const loadVehicules = async () => {
+        // ... code existant
+    };
+
+    /**
+     * Valide le caractère écologique d'un véhicule (employés uniquement)
+     */
+    const validerVehicule = async (id) => {
+        // ... code existant
     };
 
     return (

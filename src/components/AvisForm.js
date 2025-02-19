@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 import './AvisForm.css';
 
+/**
+ * Composant de formulaire d'avis
+ * Permet aux utilisateurs de donner une note et un commentaire sur un trajet
+ * @param {number} trajetId - ID du trajet concerné
+ * @param {function} onSubmit - Callback appelé après soumission réussie
+ */
 const AvisForm = ({ trajetId, onSubmit }) => {
+    // État local pour le formulaire
     const [formData, setFormData] = useState({
         note: 5,
         commentaire: ''
     });
+
+    // États pour la gestion des erreurs et succès
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    /**
+     * Gère la soumission du formulaire
+     * Envoie l'avis au serveur et met à jour l'interface
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
