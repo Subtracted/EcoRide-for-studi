@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
 import './EmployeSpace.css';
 
 const EmployeSpace = () => {
@@ -16,12 +15,23 @@ const EmployeSpace = () => {
 
     const fetchAvisEnAttente = async () => {
         try {
-            const response = await fetch('/api/employe/avis/en-attente', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+            // Données factices pour la démo
+            const data = [
+                {
+                    id: 1,
+                    auteur_pseudo: 'user1',
+                    commentaire: 'Très bon conducteur, trajet agréable',
+                    note: 5,
+                    conducteur_pseudo: 'conducteur1'
+                },
+                {
+                    id: 2,
+                    auteur_pseudo: 'user2',
+                    commentaire: 'Ponctuel et courtois',
+                    note: 4,
+                    conducteur_pseudo: 'conducteur2'
                 }
-            });
-            const data = await response.json();
+            ];
             setAvisEnAttente(data);
         } catch (err) {
             console.error('Erreur:', err);
@@ -30,12 +40,22 @@ const EmployeSpace = () => {
 
     const fetchSignalements = async () => {
         try {
-            const response = await fetch('/api/employe/signalements', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+            // Données factices pour la démo
+            const data = [
+                {
+                    id: 1,
+                    trajet_id: 123,
+                    date_signalement: new Date(),
+                    conducteur_pseudo: 'conducteur1',
+                    conducteur_email: 'conducteur1@example.com',
+                    passager_pseudo: 'passager1',
+                    passager_email: 'passager1@example.com',
+                    ville_depart: 'Paris',
+                    ville_arrivee: 'Lyon',
+                    date_depart: new Date(),
+                    description: 'Retard important sans prévenir'
                 }
-            });
-            const data = await response.json();
+            ];
             setSignalements(data);
         } catch (err) {
             console.error('Erreur:', err);
@@ -44,12 +64,12 @@ const EmployeSpace = () => {
 
     const fetchStatsCovoiturages = async () => {
         try {
-            const response = await fetch('/api/employe/stats/covoiturages', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const data = await response.json();
+            // Données factices pour la démo
+            const data = [
+                { date: '2024-01-01', nombre_trajets: 15 },
+                { date: '2024-01-02', nombre_trajets: 23 },
+                { date: '2024-01-03', nombre_trajets: 18 }
+            ];
             setStatsCovoiturages(data);
         } catch (err) {
             console.error('Erreur:', err);
@@ -58,13 +78,9 @@ const EmployeSpace = () => {
 
     const handleAvisAction = async (avisId, action) => {
         try {
-            await fetch(`/api/employe/avis/${avisId}/${action}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            fetchAvisEnAttente();
+            console.log(`${action} avis ${avisId}`);
+            // Retirer l'avis de la liste après action
+            setAvisEnAttente(avisEnAttente.filter(avis => avis.id !== avisId));
         } catch (err) {
             console.error('Erreur:', err);
         }
@@ -169,63 +185,48 @@ const EmployeSpace = () => {
 
                 {activeTab === 'stats' && (
                     <div className="stats-container">
-                        <div className="stat-card">
-                            <h3>Statistiques des covoiturages</h3>
-                            <Line 
-                                data={{
-                                    labels: statsCovoiturages.map(stat => stat.date),
-                                    datasets: [{
-                                        label: 'Nombre de trajets',
-                                        data: statsCovoiturages.map(stat => stat.nombre_trajets),
-                                        borderColor: 'rgb(34, 197, 94)',
-                                        tension: 0.1
-                                    }]
-                                }}
-                                options={{
-                                    responsive: true,
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: 'Évolution des covoiturages'
-                                        }
-                                    }
-                                }}
-                            />
+                        <div className="stats-summary">
+                            <h3>Résumé des statistiques</h3>
+                            <div className="stats-grid">
+                                <div className="stat-item">
+                                    <div className="stat-value">
+                                        {statsCovoiturages.reduce((acc, stat) => acc + stat.nombre_trajets, 0)}
+                                    </div>
+                                    <div className="stat-label">Total trajets</div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-value">
+                                        {avisEnAttente.length}
+                                    </div>
+                                    <div className="stat-label">Avis en attente</div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-value">
+                                        {signalements.length}
+                                    </div>
+                                    <div className="stat-label">Signalements actifs</div>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div className="stat-card">
-                            <h3>Places disponibles</h3>
-                            <Line 
-                                data={{
-                                    labels: statsCovoiturages.map(stat => stat.date),
-                                    datasets: [{
-                                        label: 'Places totales',
-                                        data: statsCovoiturages.map(stat => stat.places_totales),
-                                        borderColor: 'rgb(59, 130, 246)',
-                                        tension: 0.1
-                                    }, {
-                                        label: 'Places restantes',
-                                        data: statsCovoiturages.map(stat => stat.places_restantes),
-                                        borderColor: 'rgb(239, 68, 68)',
-                                        tension: 0.1
-                                    }]
-                                }}
-                                options={{
-                                    responsive: true,
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: 'Évolution des places'
-                                        }
-                                    }
-                                }}
-                            />
+                        <div className="stats-table">
+                            <h4>Évolution des trajets</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Nombre de trajets</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {statsCovoiturages.map((stat, index) => (
+                                        <tr key={index}>
+                                            <td>{stat.date}</td>
+                                            <td>{stat.nombre_trajets}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 )}

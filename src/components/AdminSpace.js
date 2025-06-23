@@ -1,28 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import CreateEmploye from './CreateEmploye';
 import EmployesList from './EmployesList';
 import './AdminSpace.css';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-);
 
 /**
  * Espace d'administration
@@ -50,10 +29,25 @@ const AdminSpace = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [employesData, statsData] = await Promise.all([
-                fetchEmployes(),
-                fetchStats()
-            ]);
+            // Données factices pour la démo
+            const employesData = [
+                { id: 1, pseudo: 'employe1', email: 'employe1@ecoride.com', statut: 'actif', role: 'employe' },
+                { id: 2, pseudo: 'employe2', email: 'employe2@ecoride.com', statut: 'actif', role: 'employe' }
+            ];
+            
+            const statsData = {
+                totalCredits: 2450,
+                covoituragesParJour: [
+                    { date: '2024-01-01', count: 5 },
+                    { date: '2024-01-02', count: 8 },
+                    { date: '2024-01-03', count: 12 }
+                ],
+                creditsParJour: [
+                    { date: '2024-01-01', amount: 125 },
+                    { date: '2024-01-02', amount: 200 },
+                    { date: '2024-01-03', amount: 300 }
+                ]
+            };
 
             setEmployes(employesData);
             setStats(statsData);
@@ -66,37 +60,19 @@ const AdminSpace = () => {
     };
 
     const fetchEmployes = async () => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/employes`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) throw new Error('Erreur lors du chargement des employés');
-        return response.json();
+        // API call would go here
+        console.log('Fetching employes...');
     };
 
     const fetchStats = async () => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/stats`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) throw new Error('Erreur lors du chargement des statistiques');
-        return response.json();
+        // API call would go here
+        console.log('Fetching stats...');
     };
 
     const handleSuspendEmploye = async (employeId) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/employes/${employeId}/suspend`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erreur lors de la suspension du compte');
-            }
+            // Simulation de l'API call
+            console.log('Suspending employe:', employeId);
 
             // Mettre à jour la liste des employés localement
             setEmployes(employes.map(employe => 
@@ -112,26 +88,6 @@ const AdminSpace = () => {
 
     if (loading) return <div className="loading">Chargement...</div>;
     if (error) return <div className="error-message">{error}</div>;
-
-    const covoituragesChartData = {
-        labels: stats.covoituragesParJour.map(stat => stat.date),
-        datasets: [{
-            label: 'Nombre de covoiturages',
-            data: stats.covoituragesParJour.map(stat => stat.count),
-            borderColor: 'rgb(34, 197, 94)',
-            tension: 0.1
-        }]
-    };
-
-    const creditsChartData = {
-        labels: stats.creditsParJour.map(stat => stat.date),
-        datasets: [{
-            label: 'Crédits gagnés',
-            data: stats.creditsParJour.map(stat => stat.amount),
-            borderColor: 'rgb(59, 130, 246)',
-            tension: 0.1
-        }]
-    };
 
     return (
         <div className="admin-space">
@@ -159,16 +115,44 @@ const AdminSpace = () => {
                         <p className="credits-amount">{stats.totalCredits}</p>
                     </div>
                     
-                    <div className="charts-container">
-                        <div className="chart-box">
-                            <h3>Covoiturages par jour</h3>
-                            <Line data={covoituragesChartData} />
+                    <div className="stats-summary">
+                        <div className="stat-item">
+                            <h4>Covoiturages aujourd'hui</h4>
+                            <div className="stat-number">
+                                {stats.covoituragesParJour.length > 0 ? 
+                                    stats.covoituragesParJour[stats.covoituragesParJour.length - 1].count : 0}
+                            </div>
                         </div>
                         
-                        <div className="chart-box">
-                            <h3>Crédits gagnés par jour</h3>
-                            <Line data={creditsChartData} />
+                        <div className="stat-item">
+                            <h4>Crédits aujourd'hui</h4>
+                            <div className="stat-number">
+                                {stats.creditsParJour.length > 0 ? 
+                                    stats.creditsParJour[stats.creditsParJour.length - 1].amount : 0}
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="stats-table">
+                        <h4>Historique des covoiturages</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Nombre de trajets</th>
+                                    <th>Crédits générés</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {stats.covoituragesParJour.map((stat, index) => (
+                                    <tr key={index}>
+                                        <td>{stat.date}</td>
+                                        <td>{stat.count}</td>
+                                        <td>{stats.creditsParJour[index]?.amount || 0}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}

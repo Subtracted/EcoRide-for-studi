@@ -1,25 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-} from 'chart.js';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-);
+import '../../styles/Dashboard.css';
 
 /**
  * Tableau de bord administrateur
@@ -44,12 +24,25 @@ const Dashboard = () => {
     const loadDashboardData = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/admin/dashboard', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const data = await response.json();
+            // Données factices pour la démo
+            const data = {
+                totalUsers: 25,
+                totalTrajets: 48,
+                totalCredits: 1250,
+                recentActivities: [],
+                stats: [
+                    { date: '2024-01-01', trajets_count: 5, credits_earned: 125 },
+                    { date: '2024-01-02', trajets_count: 8, credits_earned: 200 }
+                ],
+                recentConnections: [
+                    { userId: 1, action: 'login', timestamp: new Date(), ip: '127.0.0.1' },
+                    { userId: 2, action: 'login', timestamp: new Date(), ip: '127.0.0.1' }
+                ],
+                recentTrajetActions: [
+                    { trajetId: 1, action: 'created', userId: 3, timestamp: new Date() },
+                    { trajetId: 2, action: 'booked', userId: 4, timestamp: new Date() }
+                ]
+            };
             setDashboardData(data);
         } catch (err) {
             console.error('Erreur chargement dashboard:', err);
@@ -62,37 +55,31 @@ const Dashboard = () => {
         loadDashboardData();
     }, []);
 
-    if (loading) return <div>Chargement...</div>;
-
-    const statsData = {
-        labels: dashboardData.stats.map(stat => 
-            new Date(stat.date).toLocaleDateString()
-        ),
-        datasets: [
-            {
-                label: 'Trajets',
-                data: dashboardData.stats.map(stat => stat.trajets_count),
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            },
-            {
-                label: 'Crédits gagnés',
-                data: dashboardData.stats.map(stat => stat.credits_earned),
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
-            }
-        ]
-    };
+    if (loading) {
+        return <div className="loading">Chargement...</div>;
+    }
 
     return (
         <div className="dashboard">
             <h2>Tableau de bord</h2>
             
-            <div className="stats-chart">
-                <h3>Statistiques des 30 derniers jours</h3>
-                <Line data={statsData} />
+            {/* Statistiques rapides */}
+            <div className="stats-overview">
+                <div className="stat-card">
+                    <h3>Utilisateurs</h3>
+                    <div className="stat-number">{dashboardData.totalUsers}</div>
+                </div>
+                <div className="stat-card">
+                    <h3>Trajets</h3>
+                    <div className="stat-number">{dashboardData.totalTrajets}</div>
+                </div>
+                <div className="stat-card">
+                    <h3>Crédits totaux</h3>
+                    <div className="stat-number">{dashboardData.totalCredits}</div>
+                </div>
             </div>
 
+            {/* Activités récentes */}
             <div className="recent-activities">
                 <div className="connections">
                     <h3>Dernières connexions</h3>
