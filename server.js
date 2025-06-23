@@ -16,6 +16,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Route de santé pour Docker health check
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        service: 'EcoRide API',
+        version: '1.0.0'
+    });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/trajets', trajetsRoutes);
