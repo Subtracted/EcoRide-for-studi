@@ -31,14 +31,19 @@ const Dashboard = () => {
         totalUsers: 0,
         totalTrajets: 0,
         totalCredits: 0,
-        recentActivities: []
+        recentActivities: [],
+        stats: [],
+        recentConnections: [],
+        recentTrajetActions: []
     });
+    const [loading, setLoading] = useState(true);
 
     /**
      * Charge les données du tableau de bord
      */
     const loadDashboardData = async () => {
         try {
+            setLoading(true);
             const response = await fetch('/api/admin/dashboard', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -48,6 +53,8 @@ const Dashboard = () => {
             setDashboardData(data);
         } catch (err) {
             console.error('Erreur chargement dashboard:', err);
+        } finally {
+            setLoading(false);
         }
     };
 
