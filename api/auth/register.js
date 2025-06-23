@@ -91,7 +91,7 @@ export default async function handler(req, res) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insertion de l'utilisateur
+    // Insertion de l'utilisateur avec tous les champs de la table
     const insertResponse = await fetch(
       `${supabaseUrl}/rest/v1/utilisateurs`, 
       {
@@ -109,8 +109,15 @@ export default async function handler(req, res) {
           nom,
           prenom,
           telephone: telephone || '',
+          photo_url: '',
+          note: 0,
+          date_inscription: new Date().toISOString(),
+          nombre_avis: 0,
+          type_utilisateur: 'utilisateur',
           credits: 20,
-          role: 'utilisateur'
+          role: 'utilisateur',
+          statut: 'actif',
+          date_creation: new Date().toISOString()
         })
       }
     );
@@ -118,7 +125,7 @@ export default async function handler(req, res) {
     if (!insertResponse.ok) {
       const errorData = await insertResponse.text();
       console.error('Erreur Supabase insertion:', errorData);
-      throw new Error('Erreur lors de la création de l\'utilisateur');
+      throw new Error(`Erreur lors de la création de l'utilisateur: ${errorData}`);
     }
 
     const newUser = await insertResponse.json();
