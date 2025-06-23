@@ -1,14 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Configuration de la base de données (vous devrez adapter selon votre solution DB)
-// Pour Vercel, vous pouvez utiliser une base de données cloud comme Supabase, PlanetScale, ou Neon
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+// Configuration Supabase
+const supabaseUrl = process.env.SUPABASE_URL || 'https://gjsaovtcamcahdfks.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdqc2FvdnRjYW1jYWhkZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTgzMDYsImV4cCI6MjA0OTU5NDMwNn0.rSO2vLnQs6VJQPEe2kJLDSjjFFsrApJ5kZl4FGYLd1I';
 
 export default async function handler(req, res) {
   // Configuration CORS
@@ -53,24 +48,40 @@ export default async function handler(req, res) {
     }
 
     // Vérification si l'email existe déjà
-    const emailExists = await pool.query(
-      'SELECT * FROM utilisateurs WHERE email = $1',
-      [email]
+    const emailCheck = await fetch(
+      `${supabaseUrl}/rest/v1/utilisateurs?email=eq.${email}`, 
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
-    if (emailExists.rows.length > 0) {
+    const existingUsers = await emailCheck.json();
+    
+    if (existingUsers.length > 0) {
       return res.status(400).json({ 
         message: 'Cet email est déjà utilisé' 
       });
     }
 
     // Vérification si le pseudo existe déjà
-    const pseudoExists = await pool.query(
-      'SELECT * FROM utilisateurs WHERE pseudo = $1',
-      [pseudo]
+    const pseudoCheck = await fetch(
+      `${supabaseUrl}/rest/v1/utilisateurs?pseudo=eq.${pseudo}`, 
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
-    if (pseudoExists.rows.length > 0) {
+    const existingPseudos = await pseudoCheck.json();
+    
+    if (existingPseudos.length > 0) {
       return res.status(400).json({ 
         message: 'Ce pseudo est déjà utilisé' 
       });
@@ -81,48 +92,54 @@ export default async function handler(req, res) {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insertion de l'utilisateur
-    const result = await pool.query(`
-      INSERT INTO utilisateurs (
-        pseudo, 
-        email, 
-        mot_de_passe,
-        nom, 
-        prenom, 
-        telephone,
-        credits,
-        role
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
-      RETURNING id, pseudo, email, role`,
-      [
-        pseudo, 
-        email, 
-        hashedPassword, 
-        nom, 
-        prenom, 
-        telephone || '', 
-        20, 
-        'utilisateur'
-      ]
+    const insertResponse = await fetch(
+      `${supabaseUrl}/rest/v1/utilisateurs`, 
+      {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          pseudo,
+          email,
+          mot_de_passe: hashedPassword,
+          nom,
+          prenom,
+          telephone: telephone || '',
+          credits: 20,
+          role: 'utilisateur'
+        })
+      }
     );
 
-    console.log('Utilisateur créé:', result.rows[0]);
+    if (!insertResponse.ok) {
+      const errorData = await insertResponse.text();
+      console.error('Erreur Supabase insertion:', errorData);
+      throw new Error('Erreur lors de la création de l\'utilisateur');
+    }
+
+    const newUser = await insertResponse.json();
+    console.log('Utilisateur créé:', newUser[0]);
 
     const token = jwt.sign(
       { 
-        userId: result.rows[0].id,
-        role: result.rows[0].role
+        userId: newUser[0].id,
+        role: newUser[0].role
       },
-      process.env.JWT_SECRET || 'fallback_secret',
+      process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e',
       { expiresIn: '24h' }
     );
 
     res.status(201).json({
       message: 'Utilisateur créé avec succès',
       user: {
-        id: result.rows[0].id,
-        pseudo: result.rows[0].pseudo,
-        email: result.rows[0].email,
-        role: result.rows[0].role
+        id: newUser[0].id,
+        pseudo: newUser[0].pseudo,
+        email: newUser[0].email,
+        role: newUser[0].role
       },
       token
     });

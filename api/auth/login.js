@@ -1,11 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+// Configuration Supabase
+const supabaseUrl = process.env.SUPABASE_URL || 'https://gjsaovtcamcahdfks.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdqc2FvdnRjYW1jYWhkZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTgzMDYsImV4cCI6MjA0OTU5NDMwNn0.rSO2vLnQs6VJQPEe2kJLDSjjFFsrApJ5kZl4FGYLd1I';
 
 export default async function handler(req, res) {
   // Configuration CORS
@@ -30,34 +28,45 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Email et mot de passe requis' });
     }
 
-    const user = await pool.query(
-      'SELECT id, email, mot_de_passe, role, credits, pseudo FROM utilisateurs WHERE email = $1',
-      [email]
+    // Recherche de l'utilisateur
+    const userResponse = await fetch(
+      `${supabaseUrl}/rest/v1/utilisateurs?email=eq.${email}`, 
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
-    if (user.rows.length === 0) {
+    const users = await userResponse.json();
+
+    if (users.length === 0) {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
 
-    const validPassword = await bcrypt.compare(password, user.rows[0].mot_de_passe);
+    const user = users[0];
+    const validPassword = await bcrypt.compare(password, user.mot_de_passe);
+    
     if (!validPassword) {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
 
     const token = jwt.sign(
-      { userId: user.rows[0].id, role: user.rows[0].role },
-      process.env.JWT_SECRET || 'fallback_secret',
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e',
       { expiresIn: '24h' }
     );
 
     res.json({
       token,
       user: {
-        id: user.rows[0].id,
-        email: user.rows[0].email,
-        role: user.rows[0].role,
-        credits: user.rows[0].credits,
-        pseudo: user.rows[0].pseudo
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        credits: user.credits,
+        pseudo: user.pseudo
       }
     });
   } catch (err) {
