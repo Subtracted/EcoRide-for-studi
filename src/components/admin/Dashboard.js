@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Dashboard.css';
 
-/**
- * Tableau de bord administrateur
- * Affiche les statistiques globales et les actions rapides
- */
 const Dashboard = () => {
-    // État pour les données du tableau de bord
     const [dashboardData, setDashboardData] = useState({
         totalUsers: 0,
         totalTrajets: 0,
@@ -18,13 +13,9 @@ const Dashboard = () => {
     });
     const [loading, setLoading] = useState(true);
 
-    /**
-     * Charge les données du tableau de bord
-     */
     const loadDashboardData = async () => {
         try {
             setLoading(true);
-            // Données factices pour la démo
             const data = {
                 totalUsers: 25,
                 totalTrajets: 48,
@@ -63,7 +54,6 @@ const Dashboard = () => {
         <div className="dashboard">
             <h2>Tableau de bord</h2>
             
-            {/* Statistiques rapides */}
             <div className="stats-overview">
                 <div className="stat-card">
                     <h3>Utilisateurs</h3>
@@ -79,7 +69,6 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Activités récentes */}
             <div className="recent-activities">
                 <div className="connections">
                     <h3>Dernières connexions</h3>
