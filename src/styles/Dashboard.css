@@ -1,104 +1,104 @@
 .dashboard {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .dashboard h2 {
-    color: #2c3e50;
-    margin-bottom: 30px;
-    text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .stats-overview {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .stat-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.1em;
-    opacity: 0.9;
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  opacity: 0.9;
 }
 
 .stat-number {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin: 0;
+  font-size: 2.5em;
+  font-weight: bold;
+  margin: 0;
 }
 
 .recent-activities {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 40px;
 }
 
 .connections, .trajet-actions {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .connections h3, .trajet-actions h3 {
-    color: #2c3e50;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
 }
 
 .connections ul, .trajet-actions ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .connections li, .trajet-actions li {
-    padding: 10px;
-    border-bottom: 1px solid #ecf0f1;
-    font-size: 0.9em;
-    color: #555;
+  padding: 10px;
+  border-bottom: 1px solid #ecf0f1;
+  font-size: 0.9em;
+  color: #555;
 }
 
 .connections li:last-child, .trajet-actions li:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    font-size: 1.2em;
-    color: #7f8c8d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 1.2em;
+  color: #7f8c8d;
 }
 
 @media (max-width: 768px) {
-    .stats-overview {
-        grid-template-columns: 1fr;
-    }
-    
-    .recent-activities {
-        grid-template-columns: 1fr;
-    }
-    
-    .dashboard {
-        padding: 10px;
-    }
-} 
+  .stats-overview {
+    grid-template-columns: 1fr;
+  }
+  
+  .recent-activities {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard {
+    padding: 10px;
+  }
+}
