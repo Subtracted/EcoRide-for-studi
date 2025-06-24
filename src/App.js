@@ -16,6 +16,11 @@ import Dashboard from './components/admin/Dashboard';
 import TrajetEnCours from './components/TrajetEnCours';
 import CompteSuspendu from './components/CompteSuspendu';
 import ProtectedRoute from './components/ProtectedRoute';
+import MentionsLegales from './components/MentionsLegales';
+import ConditionsGenerales from './components/ConditionsGenerales';
+import PolitiqueConfidentialite from './components/PolitiqueConfidentialite';
+import PolitiqueCookies from './components/PolitiqueCookies';
+import Footer from './components/Footer';
 import './App.css';
 import './styles/global.css';
 
@@ -58,7 +63,14 @@ function App() {
                             } 
                         />
                         <Route path="/covoiturage/:id" element={<TrajetEnCours />} />
+                        
+                        {/* Pages légales */}
+                        <Route path="/mentions-legales" element={<MentionsLegales />} />
+                        <Route path="/conditions-generales" element={<ConditionsGenerales />} />
+                        <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+                        <Route path="/politique-cookies" element={<PolitiqueCookies />} />
                     </Routes>
+                    <Footer />
                 </div>
             </Router>
         </AuthProvider>

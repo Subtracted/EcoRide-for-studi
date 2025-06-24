@@ -1,0 +1,135 @@
+.mentions-legales {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.mentions-legales .container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+}
+
+.mentions-legales h1 {
+  color: #2d5a87;
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  border-bottom: 3px solid #4CAF50;
+  padding-bottom: 1rem;
+}
+
+.legal-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  border-left: 4px solid #4CAF50;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+.legal-section h2 {
+  color: #2d5a87;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.legal-section h3 {
+  color: #333;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.legal-content {
+  line-height: 1.6;
+  color: #555;
+}
+
+.legal-content p {
+  margin-bottom: 1rem;
+  text-align: justify;
+}
+
+.legal-content ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.legal-content li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-content a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.legal-content a:hover {
+  color: #2d5a87;
+  text-decoration: underline;
+}
+
+.legal-content strong {
+  color: #2d5a87;
+  font-weight: 600;
+}
+
+.update-date {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.update-date p {
+  color: #888;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mentions-legales .container {
+    margin: 1rem;
+    padding: 2rem;
+  }
+  
+  .mentions-legales h1 {
+    font-size: 2rem;
+  }
+  
+  .legal-section {
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .legal-section h2 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mentions-legales .container {
+    margin: 0.5rem;
+    padding: 1.5rem;
+  }
+  
+  .mentions-legales h1 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  
+  .legal-section {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+} 

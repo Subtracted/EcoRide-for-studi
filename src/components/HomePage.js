@@ -123,9 +123,14 @@ const HomePage = () => {
                 <div className="footer-content">
                     <div className="footer-contact">
                         <p>Email: <a href="mailto:contact@ecoride.fr">contact@ecoride.fr</a></p>
+                        <p>&copy; 2024 EcoRide - Projet pédagogique</p>
                     </div>
                     <div className="footer-links">
                         <Link to="/mentions-legales">Mentions légales</Link>
+                        <Link to="/conditions-generales">CGU</Link>
+                        <Link to="/politique-confidentialite">Confidentialité</Link>
+                        <Link to="/politique-cookies">Cookies</Link>
+                        <Link to="/contact">Contact</Link>
                     </div>
                 </div>
             </footer>
