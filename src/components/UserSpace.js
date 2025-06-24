@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import PreferencesConducteur from './PreferencesConducteur';
 import './UserSpace.css';
 
@@ -24,12 +25,12 @@ const UserSpace = () => {
                 const [reservationsRes, trajetsRes] = await Promise.all([
                     fetch(`${process.env.REACT_APP_API_URL}/api/user?type=reservations`, {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            'Authorization': `Bearer ${getAuthToken()}`
                         }
                     }),
                     fetch(`${process.env.REACT_APP_API_URL}/api/user?type=trajets`, {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            'Authorization': `Bearer ${getAuthToken()}`
                         }
                     })
                 ]);
