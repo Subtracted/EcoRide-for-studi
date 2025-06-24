@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import './ProfilConducteur.css';
 
 const ProfilConducteur = () => {
@@ -30,7 +31,7 @@ const ProfilConducteur = () => {
             try {
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${getAuthToken()}`
                     }
                 });
                 
@@ -60,7 +61,7 @@ const ProfilConducteur = () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/preferences`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 }
             });
 
@@ -90,7 +91,7 @@ const ProfilConducteur = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify(newVehicule)
             });
@@ -128,7 +129,7 @@ const ProfilConducteur = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify({ description: newCustomPreference })
             });
@@ -148,7 +149,7 @@ const ProfilConducteur = () => {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/preferences/custom/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 }
             });
 
@@ -166,7 +167,7 @@ const ProfilConducteur = () => {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/become-driver`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 }
             });
 
