@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import './SaisirVoyage.css';
 
 const SaisirVoyage = () => {
@@ -34,11 +35,11 @@ const SaisirVoyage = () => {
 
         const fetchVehicules = async () => {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
+                            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
+                headers: {
+                    'Authorization': `Bearer ${getAuthToken()}`
+                }
+            });
                 
                 if (!response.ok) {
                     throw new Error('Erreur chargement véhicules');
@@ -77,7 +78,7 @@ const SaisirVoyage = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify(trajetData)
             });
