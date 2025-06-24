@@ -22,12 +22,12 @@ const UserSpace = () => {
         const fetchUserData = async () => {
             try {
                 const [reservationsRes, trajetsRes] = await Promise.all([
-                    fetch(`${process.env.REACT_APP_API_URL}/api/reservations/user`, {
+                    fetch(`${process.env.REACT_APP_API_URL}/api/user?type=reservations`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     }),
-                    fetch(`${process.env.REACT_APP_API_URL}/api/trajets/conducteur`, {
+                    fetch(`${process.env.REACT_APP_API_URL}/api/user?type=trajets`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }

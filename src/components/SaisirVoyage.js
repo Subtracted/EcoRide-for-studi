@@ -34,7 +34,7 @@ const SaisirVoyage = () => {
 
         const fetchVehicules = async () => {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules/mes-vehicules`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }

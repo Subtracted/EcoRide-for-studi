@@ -33,7 +33,7 @@ const Covoiturages = () => {
             if (params.est_ecologique) queryParams.append('est_ecologique', 'true');
 
             const response = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/trajets/search?${queryParams}`,
+                `${process.env.REACT_APP_API_URL}/api/trajets?${queryParams}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -121,7 +121,7 @@ const Covoiturages = () => {
                 setMessage('Réservation effectuée avec succès !');
                 // Rafraîchir les trajets
                 const updatedResponse = await fetch(
-                    `${process.env.REACT_APP_API_URL}/api/trajets/search?` + 
+                    `${process.env.REACT_APP_API_URL}/api/trajets?` + 
                     new URLSearchParams({
                         depart: searchParams.get('depart'),
                         arrivee: searchParams.get('arrivee'),
