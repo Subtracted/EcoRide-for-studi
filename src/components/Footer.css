@@ -1,5 +1,5 @@
 .global-footer {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #10B981, #059669);
   color: white;
   margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -20,12 +20,12 @@
 }
 
 .footer-section h4 {
-  color: #A5D6A7;
+  color: #6EE7B7;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #A5D6A7;
+  border-bottom: 2px solid #6EE7B7;
   width: fit-content;
 }
 
@@ -56,21 +56,21 @@
 
 .footer-nav a:hover,
 .footer-legal a:hover {
-  color: #A5D6A7;
-  border-left-color: #A5D6A7;
+  color: #6EE7B7;
+  border-left-color: #6EE7B7;
   padding-left: 1rem;
-  background: rgba(165, 214, 167, 0.2);
+  background: rgba(110, 231, 183, 0.2);
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
 .footer-section a {
-  color: #A5D6A7;
+  color: #6EE7B7;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .footer-section a:hover {
-  color: #C8E6C9;
+  color: #A7F3D0;
   text-decoration: underline;
 }
 
@@ -103,7 +103,7 @@
 .footer-tech small {
   font-size: 0.8rem;
   opacity: 0.7;
-  color: #A5D6A7;
+  color: #6EE7B7;
   font-weight: 500;
 }
 
