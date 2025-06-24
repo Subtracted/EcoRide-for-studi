@@ -21,6 +21,7 @@ import ConditionsGenerales from './components/ConditionsGenerales';
 import PolitiqueConfidentialite from './components/PolitiqueConfidentialite';
 import PolitiqueCookies from './components/PolitiqueCookies';
 import Footer from './components/Footer';
+import CookieConsent from './components/CookieConsent';
 import './App.css';
 import './styles/global.css';
 
@@ -71,6 +72,7 @@ function App() {
                         <Route path="/politique-cookies" element={<PolitiqueCookies />} />
                     </Routes>
                     <Footer />
+                    <CookieConsent />
                 </div>
             </Router>
         </AuthProvider>
