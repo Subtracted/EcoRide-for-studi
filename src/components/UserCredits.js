@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import './UserCredits.css';
 
 const UserCredits = () => {
@@ -21,7 +22,7 @@ const UserCredits = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify({ montant })
             });
