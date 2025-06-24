@@ -9,7 +9,7 @@ const EmployesList = ({ employes, onSuspend }) => {
                 {employes.map(employe => (
                     <div key={employe.id} className="employe-card">
                         <div className="employe-info">
-                            <h4>{employe.prenom} {employe.nom}</h4>
+                            <h4>{employe.prenom || employe.pseudo} {employe.nom || ''}</h4>
                             <p>{employe.email}</p>
                             <span className={`status ${employe.statut}`}>
                                 {employe.statut === 'actif' ? 'Actif' : 'Suspendu'}
