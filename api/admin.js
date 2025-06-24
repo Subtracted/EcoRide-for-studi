@@ -137,26 +137,45 @@ async function createOrUpdateAdmin(req, res) {
 
 async function getAdminInfo(req, res) {
   try {
-    // Récupérer les infos de l'admin
-    const response = await fetch(
+    console.log('🔧 Vérification et mise à jour automatique du mot de passe admin...');
+    
+    // Hash du mot de passe admin123
+    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    
+    // Récupérer et mettre à jour l'admin en une fois
+    const updateResponse = await fetch(
       `${supabaseUrl}/rest/v1/utilisateurs?email=eq.admin@ecoride.com`,
       {
+        method: 'PATCH',
         headers: {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          mot_de_passe: hashedPassword,
+          role: 'admin',
+          statut: 'actif'
+        })
       }
     );
 
-    const users = await response.json();
+    if (!updateResponse.ok) {
+      const errorText = await updateResponse.text();
+      console.error('❌ Erreur mise à jour admin:', errorText);
+      return res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'admin' });
+    }
+
+    const updatedUsers = await updateResponse.json();
     
-    if (users.length === 0) {
+    if (updatedUsers.length === 0) {
       return res.status(404).json({ message: 'Utilisateur admin non trouvé' });
     }
 
-    const admin = users[0];
+    const admin = updatedUsers[0];
     return res.json({
+      message: '✅ Mot de passe admin mis à jour automatiquement - Connexion: admin@ecoride.com / admin123',
       admin: {
         id: admin.id,
         email: admin.email,
@@ -167,7 +186,7 @@ async function getAdminInfo(req, res) {
       }
     });
   } catch (err) {
-    console.error('❌ Erreur récupération admin:', err);
+    console.error('❌ Erreur récupération/mise à jour admin:', err);
     res.status(500).json({ message: 'Erreur serveur', error: err.message });
   }
 } 
