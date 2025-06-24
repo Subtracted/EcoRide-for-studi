@@ -13,6 +13,7 @@ const Login = () => {
         email: '',
         password: ''
     });
+    const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { login } = useAuth();
@@ -38,7 +39,7 @@ const Login = () => {
             const result = await login({
                 email: formData.email,
                 password: formData.password
-            });
+            }, rememberMe);
 
             if (result.success) {
                 navigate('/mon-espace');
@@ -77,6 +78,22 @@ const Login = () => {
                         onChange={handleChange}
                         required
                     />
+                </div>
+
+                <div className="form-group checkbox-group">
+                    <label className="checkbox-label">
+                        <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                        />
+                        <span className="checkbox-text">
+                            Se souvenir de moi (30 jours)
+                        </span>
+                    </label>
+                    <small className="checkbox-info">
+                        Votre session restera active plus longtemps sur cet appareil
+                    </small>
                 </div>
 
                 <button type="submit" className="login-button">
