@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CreateEmploye from './CreateEmploye';
 import EmployesList from './EmployesList';
 import './AdminSpace.css';
+import { getAuthToken } from '../utils/cookies';
 
 /**
  * Espace d'administration
@@ -29,12 +30,43 @@ const AdminSpace = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            // Données factices pour la démo
-            const employesData = [
-                { id: 1, pseudo: 'employe1', email: 'employe1@ecoride.com', statut: 'actif', role: 'employe' },
-                { id: 2, pseudo: 'employe2', email: 'employe2@ecoride.com', statut: 'actif', role: 'employe' }
-            ];
+            await fetchEmployes();
+            await fetchStats();
+        } catch (err) {
+            setError("Erreur lors du chargement des données");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchEmployes = async () => {
+        try {
+            const token = getAuthToken();
+            console.log('🔄 Récupération des employés...');
             
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employes`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération des employés');
+            }
+
+            const data = await response.json();
+            console.log('✅ Employés récupérés:', data.employes);
+            setEmployes(data.employes || []);
+        } catch (err) {
+            console.error('❌ Erreur récupération employés:', err);
+            setEmployes([]); // Fallback à un tableau vide
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            // Données factices pour les stats en attendant une vraie API
             const statsData = {
                 totalCredits: 2450,
                 covoituragesParJour: [
@@ -48,41 +80,43 @@ const AdminSpace = () => {
                     { date: '2024-01-03', amount: 300 }
                 ]
             };
-
-            setEmployes(employesData);
             setStats(statsData);
+            console.log('✅ Stats chargées');
         } catch (err) {
-            setError("Erreur lors du chargement des données");
-            console.error(err);
-        } finally {
-            setLoading(false);
+            console.error('❌ Erreur chargement stats:', err);
         }
-    };
-
-    const fetchEmployes = async () => {
-        // API call would go here
-        console.log('Fetching employes...');
-    };
-
-    const fetchStats = async () => {
-        // API call would go here
-        console.log('Fetching stats...');
     };
 
     const handleSuspendEmploye = async (employeId) => {
         try {
-            // Simulation de l'API call
-            console.log('Suspending employe:', employeId);
+            const token = getAuthToken();
+            const employe = employes.find(emp => emp.id === employeId);
+            const newStatut = employe.statut === 'actif' ? 'suspendu' : 'actif';
+            
+            console.log(`🔄 ${newStatut === 'suspendu' ? 'Suspension' : 'Réactivation'} de l'employé ${employeId}...`);
 
-            // Mettre à jour la liste des employés localement
-            setEmployes(employes.map(employe => 
-                employe.id === employeId 
-                    ? { ...employe, statut: employe.statut === 'actif' ? 'suspendu' : 'actif' }
-                    : employe
-            ));
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employes`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id: employeId,
+                    statut: newStatut
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la mise à jour du statut');
+            }
+
+            // Rafraîchir la liste
+            await fetchEmployes();
+            console.log(`✅ Employé ${newStatut === 'suspendu' ? 'suspendu' : 'réactivé'} avec succès`);
         } catch (err) {
             setError(err.message);
-            console.error('Erreur lors de la suspension:', err);
+            console.error('❌ Erreur lors de la suspension:', err);
         }
     };
 
@@ -165,7 +199,6 @@ const AdminSpace = () => {
                     </div>
                     
                     <div className="employes-list-section">
-                        <h3>Liste des employés</h3>
                         <EmployesList 
                             employes={employes} 
                             onSuspend={handleSuspendEmploye}
