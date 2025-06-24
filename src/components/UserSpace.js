@@ -159,10 +159,46 @@ const UserSpace = () => {
                                 <div className="reservations-grid">
                                     {reservations.map(reservation => (
                                         <div key={reservation.id} className="reservation-card">
-                                            <h4>{reservation.depart} → {reservation.arrivee}</h4>
-                                            <p>Date : {new Date(reservation.date_depart).toLocaleString()}</p>
-                                            <p>Conducteur : {reservation.conducteur_pseudo}</p>
-                                            <p>Prix : {reservation.prix}€</p>
+                                            <div className="reservation-header">
+                                                <h4>{reservation.depart} → {reservation.arrivee}</h4>
+                                                <span className={`status ${reservation.statut}`}>
+                                                    {reservation.statut === 'confirmee' ? 'Confirmée' : reservation.statut}
+                                                </span>
+                                            </div>
+                                            <div className="reservation-details">
+                                                <p>
+                                                    <i className="fas fa-calendar"></i> 
+                                                    Date: {reservation.date_depart ? 
+                                                        new Date(reservation.date_depart).toLocaleDateString('fr-FR') : 
+                                                        'Date non disponible'
+                                                    }
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-clock"></i>
+                                                    Heure: {reservation.date_depart ? 
+                                                        new Date(reservation.date_depart).toLocaleTimeString('fr-FR', { 
+                                                            hour: '2-digit', 
+                                                            minute: '2-digit' 
+                                                        }) : 
+                                                        'Heure non disponible'
+                                                    }
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-user"></i>
+                                                    Conducteur: {reservation.conducteur_pseudo}
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-euro-sign"></i>
+                                                    Prix: {reservation.prix_total || reservation.prix} crédits
+                                                </p>
+                                                <p>
+                                                    <i className="fas fa-calendar-check"></i>
+                                                    Réservé le: {reservation.date_reservation ? 
+                                                        new Date(reservation.date_reservation).toLocaleDateString('fr-FR') : 
+                                                        'Date inconnue'
+                                                    }
+                                                </p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
