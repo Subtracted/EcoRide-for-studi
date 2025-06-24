@@ -56,17 +56,21 @@ export default async function handler(req, res) {
     
     // Retourner les données du profil (sans le mot de passe)
     res.json({
-      id: user.id,
-      pseudo: user.pseudo,
-      email: user.email,
-      nom: user.nom,
-      prenom: user.prenom,
-      telephone: user.telephone,
-      credits: user.credits,
-      role: user.role,
-      photo_url: user.photo_url,
-      note: user.note,
-      nombre_avis: user.nombre_avis
+      user: {
+        id: user.id,
+        pseudo: user.pseudo,
+        email: user.email,
+        nom: user.nom,
+        prenom: user.prenom,
+        telephone: user.telephone,
+        credits: user.credits,
+        role: user.role,
+        statut: user.statut,  // IMPORTANT : Ajout du statut pour ProtectedRoute
+        photo_url: user.photo_url,
+        note: user.note,
+        nombre_avis: user.nombre_avis,
+        type_utilisateur: user.type_utilisateur
+      }
     });
 
   } catch (err) {
