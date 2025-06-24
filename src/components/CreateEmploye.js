@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './CreateEmploye.css';
+import { getAuthToken } from '../utils/cookies';
 
 const CreateEmploye = ({ onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -24,13 +25,17 @@ const CreateEmploye = ({ onSuccess }) => {
         setSuccess('');
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/employes`, {
+            const token = getAuthToken();
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    ...formData,
+                    role: 'employe'
+                })
             });
 
             if (!response.ok) {
