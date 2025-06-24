@@ -1,218 +1,641 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { getAuthToken } from '../utils/cookies';
-import PreferencesConducteur from './PreferencesConducteur';
-import './UserSpace.css';
+.user-space {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
 
-const UserSpace = () => {
-    const [reservations, setReservations] = useState([]);
-    const [mesTrajets, setMesTrajets] = useState([]);
-    const [activeTab, setActiveTab] = useState('trajets');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const { user } = useAuth();
-    const navigate = useNavigate();
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
 
-    useEffect(() => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
+.user-credits {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
 
-        const fetchUserData = async () => {
-            try {
-                const [reservationsRes, trajetsRes] = await Promise.all([
-                    fetch(`${process.env.REACT_APP_API_URL}/api/user?type=reservations`, {
-                        headers: {
-                            'Authorization': `Bearer ${getAuthToken()}`
-                        }
-                    }),
-                    fetch(`${process.env.REACT_APP_API_URL}/api/user?type=trajets`, {
-                        headers: {
-                            'Authorization': `Bearer ${getAuthToken()}`
-                        }
-                    })
-                ]);
+.user-space h2 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+}
 
-                const [reservationsData, trajetsData] = await Promise.all([
-                    reservationsRes.json(),
-                    trajetsRes.json()
-                ]);
+.user-info {
+    text-align: center;
+    margin-bottom: 2rem;
+}
 
-                setReservations(reservationsData);
-                setMesTrajets(trajetsData);
-            } catch (err) {
-                setError('Erreur lors du chargement des données');
-            } finally {
-                setLoading(false);
-            }
-        };
+.user-info h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
 
-        fetchUserData();
-    }, [user, navigate]);
+.reservations-list, .trajets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
 
-    return (
-        <div className="user-space">
-            <h2>Mon Espace</h2>
+.reservations-list h3, .trajets-list h3 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
 
-            <div className="tabs">
-                <button 
-                    className={`tab ${activeTab === 'trajets' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('trajets')}
-                >
-                    Mes trajets proposés
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'reservations' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('reservations')}
-                >
-                    Mes réservations
-                </button>
-                <button 
-                    className={`tab ${activeTab === 'preferences' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('preferences')}
-                >
-                    Mes préférences conducteur
-                </button>
-            </div>
+.reservation-card, .trajet-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-            {loading ? (
-                <div className="loading">Chargement...</div>
-            ) : error ? (
-                <div className="error">{error}</div>
-            ) : (
-                <div className="tab-content">
-                    {activeTab === 'trajets' && (
-                        <div className="trajets-list">
-                            <h3>Mes trajets proposés</h3>
-                            {mesTrajets.length === 0 ? (
-                                <p className="empty-message">
-                                    Vous n'avez pas encore proposé de trajets.
-                                    <button 
-                                        onClick={() => navigate('/saisir-voyage')}
-                                        className="action-button"
-                                    >
-                                        Proposer un trajet
-                                    </button>
-                                </p>
-                            ) : (
-                                <div className="trajets-grid">
-                                    {mesTrajets.map(trajet => (
-                                        <div key={trajet.id} className="trajet-card">
-                                            <div className="trajet-header">
-                                                <h4>{trajet.depart} → {trajet.arrivee}</h4>
-                                                <span className={`status ${trajet.places_restantes === 0 ? 'complet' : ''}`}>
-                                                    {trajet.places_restantes === 0 ? 'Complet' : `${trajet.places_restantes} places disponibles`}
-                                                </span>
-                                            </div>
-                                            <div className="trajet-details">
-                                                <p>
-                                                    <i className="fas fa-calendar"></i> 
-                                                    {new Date(trajet.date_depart).toLocaleDateString('fr-FR')}
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-clock"></i> 
-                                                    {new Date(trajet.date_depart).toLocaleTimeString('fr-FR', { 
-                                                        hour: '2-digit', 
-                                                        minute: '2-digit' 
-                                                    })}
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-car"></i> 
-                                                    {trajet.marque} {trajet.modele}
-                                                    {trajet.est_ecologique && 
-                                                        <span className="eco-badge" title="Véhicule écologique">🌱</span>
-                                                    }
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-euro-sign"></i> 
-                                                    {trajet.prix} crédits
-                                                </p>
-                                            </div>
-                                            {trajet.commentaire && (
-                                                <div className="trajet-commentaire">
-                                                    <i className="fas fa-comment"></i> {trajet.commentaire}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
+.reservation-card:hover, .trajet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
 
-                    {activeTab === 'reservations' && (
-                        <div className="reservations-list">
-                            <h3>Mes réservations</h3>
-                            {reservations.length === 0 ? (
-                                <p className="empty-message">
-                                    Vous n'avez pas encore de réservations.
-                                    <button 
-                                        onClick={() => navigate('/covoiturages')}
-                                        className="action-button"
-                                    >
-                                        Rechercher un trajet
-                                    </button>
-                                </p>
-                            ) : (
-                                <div className="reservations-grid">
-                                    {reservations.map(reservation => (
-                                        <div key={reservation.id} className="reservation-card">
-                                            <div className="reservation-header">
-                                                <h4>{reservation.depart} → {reservation.arrivee}</h4>
-                                                <span className={`status ${reservation.statut}`}>
-                                                    {reservation.statut === 'confirmee' ? 'Confirmée' : reservation.statut}
-                                                </span>
-                                            </div>
-                                            <div className="reservation-details">
-                                                <p>
-                                                    <i className="fas fa-calendar"></i> 
-                                                    Date: {reservation.date_depart ? 
-                                                        new Date(reservation.date_depart).toLocaleDateString('fr-FR') : 
-                                                        'Date non disponible'
-                                                    }
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-clock"></i>
-                                                    Heure: {reservation.date_depart ? 
-                                                        new Date(reservation.date_depart).toLocaleTimeString('fr-FR', { 
-                                                            hour: '2-digit', 
-                                                            minute: '2-digit' 
-                                                        }) : 
-                                                        'Heure non disponible'
-                                                    }
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-user"></i>
-                                                    Conducteur: {reservation.conducteur_pseudo}
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-euro-sign"></i>
-                                                    Prix: {reservation.prix_total || reservation.prix} crédits
-                                                </p>
-                                                <p>
-                                                    <i className="fas fa-calendar-check"></i>
-                                                    Réservé le: {reservation.date_reservation ? 
-                                                        new Date(reservation.date_reservation).toLocaleDateString('fr-FR') : 
-                                                        'Date inconnue'
-                                                    }
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
+.reservation-header, .trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #E5E7EB;
+}
 
-                    {activeTab === 'preferences' && (
-                        <PreferencesConducteur />
-                    )}
-                </div>
-            )}
-        </div>
-    );
-};
+.reservation-header h4, .trajet-header h4 {
+    font-size: 1.25rem;
+    color: var(--text-color);
+    margin: 0;
+}
 
-export default UserSpace; 
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status.en_attente {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.status.confirmee {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.status.annulee {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.reservation-details, .trajet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.reservation-details p, .trajet-details p {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.prix {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.eco-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: #D1FAE5;
+    color: #059669;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.no-data {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    color: #6B7280;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+}
+
+.error {
+    color: #DC2626;
+    text-align: center;
+    padding: 2rem;
+}
+
+@media (max-width: 640px) {
+    .user-space {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab {
+        width: 100%;
+    }
+
+    .reservation-header, .trajet-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #E5E7EB;
+    padding-bottom: 0.5rem;
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 0.5rem 0.5rem 0 0;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    color: var(--primary-color);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.tab.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    font-weight: 500;
+}
+
+.tab-content {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+        border-bottom: none;
+    }
+
+    .tab {
+        width: 100%;
+        text-align: left;
+        border-radius: 0.5rem;
+    }
+
+    .tab.active {
+        background: rgba(34, 197, 94, 0.1);
+        border-bottom: none;
+    }
+}
+
+.noter-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-normal);
+}
+
+.noter-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 500px;
+    width: 90%;
+}
+
+.avis-envoye {
+    display: inline-block;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    background-color: #D1FAE5;
+    color: #059669;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #D1FAE5;
+    color: #059669;
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    animation: slideIn 0.3s ease-out;
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.vehicule-form {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.vehicule-form .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.vehicule-form input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+}
+
+.vehicule-form button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.vehicule-form button:hover {
+    background-color: var(--secondary-color);
+}
+
+.preferences-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.custom-preferences form {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.custom-preferences input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+}
+
+.custom-preference-item button {
+    background: none;
+    border: none;
+    color: var(--error-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+}
+
+.custom-preference-item button:hover {
+    opacity: 0.8;
+}
+
+.user-space-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.trajets-en-cours-section {
+    margin-top: 2rem;
+}
+
+.trajets-en-cours-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tab[data-count]::after {
+    content: attr(data-count);
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+/* Ajustements pour mobile */
+@media (max-width: 640px) {
+    .trajets-en-cours-section {
+        margin: 1rem;
+    }
+}
+
+.cancel-button {
+    background: #EF4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+    background: #DC2626;
+}
+
+@media (max-width: 768px) {
+    .user-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .tab {
+        width: 100%;
+        text-align: center;
+    }
+
+    .trajets-grid,
+    .reservations-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trajet-card,
+    .reservation-card {
+        margin: 0.5rem 0;
+    }
+}
+
+.trajets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.trajet-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.trajet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.trajet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.trajet-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.status {
+    font-size: 0.9em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status.complet {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.trajet-details {
+    display: grid;
+    gap: 10px;
+}
+
+.trajet-details p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trajet-details i {
+    color: #666;
+    width: 20px;
+}
+
+.eco-badge {
+    margin-left: 8px;
+    font-size: 1.2em;
+}
+
+.trajet-commentaire {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Style général de l'espace utilisateur */
+.user-space {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* En-tête avec les informations de l'utilisateur */
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+/* Navigation par onglets */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    /* Pour plus tard: ajouter animation de transition */
+}
+
+.tab-button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-button.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Liste des trajets */
+.trajets-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Carte de trajet */
+.trajet-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* A faire: ajouter des animations au survol des cartes */
+
+/* Version mobile */
+@media (max-width: 768px) {
+    .user-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* A faire: ajouter des animations au survol des cartes */
+
+/* Grille des réservations */
+.reservations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.reservation-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.reservation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.reservation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.reservation-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.reservation-details {
+    display: grid;
+    gap: 10px;
+}
+
+.reservation-details p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+}
+
+.reservation-details i {
+    color: #52c41a;
+    width: 20px;
+}
+
+.status.confirmee {
+    background: #f6ffed;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+}
+
+/* Version mobile */ 
