@@ -73,7 +73,7 @@ const TrajetEnCours = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ trajetId: id })
+                body: JSON.stringify({ trajet_id: id })
             });
 
             console.log('Réponse status:', response.status);
@@ -85,7 +85,7 @@ const TrajetEnCours = () => {
 
             const data = await response.json();
             navigate('/mon-espace', { 
-                state: { message: 'Réservation effectuée avec succès !' } 
+                state: { message: data.message || 'Réservation effectuée avec succès !' } 
             });
         } catch (err) {
             console.error('Erreur détaillée:', err);
