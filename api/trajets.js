@@ -144,15 +144,26 @@ export default async function handler(req, res) {
       console.log('Données reçues pour création trajet:', req.body);
       console.log('User ID from token:', decoded.userId);
 
+      // Conversion des types de données
+      const vehiculeIdInt = parseInt(vehicule_id);
+      const placesTotalesInt = parseInt(places_totales);
+      const prixFloat = parseFloat(prix);
+
       // Validation des données
       if (!depart || !arrivee || !date_depart || !prix || !places_totales || !vehicule_id) {
         console.log('Validation échouée:', { depart, arrivee, date_depart, prix, places_totales, vehicule_id });
         return res.status(400).json({ message: 'Tous les champs requis doivent être remplis' });
       }
 
+      // Validation des types convertis
+      if (isNaN(vehiculeIdInt) || isNaN(placesTotalesInt) || isNaN(prixFloat)) {
+        console.log('Erreur conversion types:', { vehiculeIdInt, placesTotalesInt, prixFloat });
+        return res.status(400).json({ message: 'Formats de données invalides' });
+      }
+
       // Vérifier que le véhicule appartient bien au conducteur
       const vehiculeResponse = await fetch(
-        `${supabaseUrl}/rest/v1/vehicules?id=eq.${vehicule_id}&conducteur_id=eq.${decoded.userId}`, 
+        `${supabaseUrl}/rest/v1/vehicules?id=eq.${vehiculeIdInt}&conducteur_id=eq.${decoded.userId}`, 
         {
           headers: {
             'apikey': supabaseKey,
@@ -170,7 +181,7 @@ export default async function handler(req, res) {
       const vehicules = await vehiculeResponse.json();
       
       if (vehicules.length === 0) {
-        console.log('Véhicule non trouvé:', vehicule_id, 'pour conducteur:', decoded.userId);
+        console.log('Véhicule non trouvé:', vehiculeIdInt, 'pour conducteur:', decoded.userId);
         return res.status(400).json({ message: 'Véhicule non trouvé ou non autorisé' });
       }
 
@@ -186,14 +197,14 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             conducteur_id: decoded.userId,
-            vehicule_id,
+            vehicule_id: vehiculeIdInt,
             depart,
             arrivee,
             date_depart,
             date_arrivee,
-            prix,
-            places_totales,
-            places_restantes: places_totales,
+            prix: prixFloat,
+            places_totales: placesTotalesInt,
+            places_restantes: placesTotalesInt,
             est_ecologique: est_ecologique || false,
             commentaire: commentaire || '',
             created_at: new Date().toISOString()
