@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getAuthToken, setAuthToken, clearAuthToken } from '../utils/cookies';
 
 const AuthContext = createContext(null);
 
@@ -7,7 +8,7 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         if (token) {
             try {
                 const decoded = JSON.parse(atob(token.split('.')[1]));
@@ -28,7 +29,7 @@ const AuthProvider = ({ children }) => {
                 })
                 .catch(err => {
                     console.error('Erreur récupération profil:', err);
-                    localStorage.removeItem('token');
+                    clearAuthToken();
                     setUser(null);
                 })
                 .finally(() => {
@@ -36,7 +37,7 @@ const AuthProvider = ({ children }) => {
                 });
             } catch (err) {
                 console.error('Erreur décodage token:', err);
-                localStorage.removeItem('token');
+                clearAuthToken();
                 setUser(null);
                 setLoading(false);
             }
@@ -45,7 +46,7 @@ const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const login = async (credentials) => {
+    const login = async (credentials, rememberMe = false) => {
         try {
             console.log('Données envoyées:', credentials); // Debug
 
@@ -60,8 +61,9 @@ const AuthProvider = ({ children }) => {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('token', data.token);
+                setAuthToken(data.token, rememberMe);
                 setUser(data.user);
+                console.log(`Connexion réussie - Se souvenir: ${rememberMe ? 'Oui (30 jours)' : 'Non (24h)'}`);
                 return { success: true };
             } else {
                 throw new Error(data.message);
@@ -73,14 +75,15 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        clearAuthToken();
         setUser(null);
+        console.log('Déconnexion réussie - Cookie supprimé');
     };
 
-    const register = async (user, token) => {
+    const register = async (user, token, rememberMe = false) => {
         try {
             console.log('Tentative d\'enregistrement:', { user, token });
-            localStorage.setItem('token', token);
+            setAuthToken(token, rememberMe);
             setUser(user);
             console.log('Utilisateur enregistré avec succès');
         } catch (err) {
