@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import './PreferencesConducteur.css';
 
 const PreferencesConducteur = () => {
@@ -21,7 +22,7 @@ const PreferencesConducteur = () => {
             
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/preferences`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 }
             });
 
@@ -55,7 +56,7 @@ const PreferencesConducteur = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify({ preferenceId: prefId })
             });
@@ -85,7 +86,7 @@ const PreferencesConducteur = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify({ libelle: newPref })
             });
