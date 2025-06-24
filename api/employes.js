@@ -160,6 +160,8 @@ async function getEmployes(req, res) {
 
     const employes = await response.json();
     
+    console.log('🔍 Employés trouvés:', employes);
+    
     res.json({
       employes: employes.map(emp => ({
         id: emp.id,
