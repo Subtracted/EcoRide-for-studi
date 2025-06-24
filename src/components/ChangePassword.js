@@ -58,7 +58,7 @@ const ChangePassword = ({ onClose, onSuccess }) => {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/change-password`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
