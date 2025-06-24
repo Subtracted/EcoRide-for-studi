@@ -37,7 +37,7 @@ export const validatePassword = (password) => {
   }
 
   // Vérification de la présence de caractères spéciaux
-  if (PASSWORD_CONSTRAINTS.requireSpecialChars && !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (PASSWORD_CONSTRAINTS.requireSpecialChars && !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
     errors.push('Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*()_+-=[]{}|;:,.<>?)');
   }
 
@@ -97,7 +97,7 @@ export const evaluatePasswordStrength = (password) => {
   if (/[a-z]/.test(password)) score += 1;
   if (/[A-Z]/.test(password)) score += 1;
   if (/\d/.test(password)) score += 1;
-  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+  if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) score += 1;
 
   // Bonus pour la diversité
   if (password.length > 0) {
@@ -110,7 +110,7 @@ export const evaluatePasswordStrength = (password) => {
   if (!/[a-z]/.test(password)) suggestions.push('Ajoutez des lettres minuscules');
   if (!/[A-Z]/.test(password)) suggestions.push('Ajoutez des lettres majuscules');
   if (!/\d/.test(password)) suggestions.push('Ajoutez des chiffres');
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) suggestions.push('Ajoutez des caractères spéciaux');
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) suggestions.push('Ajoutez des caractères spéciaux');
 
   // Détermination de la force
   let strength;
