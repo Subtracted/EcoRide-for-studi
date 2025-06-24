@@ -9,9 +9,22 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = getAuthToken();
+        console.log('🔄 AuthContext useEffect - Token trouvé:', !!token);
+        
         if (token) {
             try {
                 const decoded = JSON.parse(atob(token.split('.')[1]));
+                console.log('🔓 Token décodé, expiration:', new Date(decoded.exp * 1000));
+                
+                // Vérifier si le token n'est pas expiré
+                const now = Date.now() / 1000;
+                if (decoded.exp < now) {
+                    console.log('⏰ Token expiré, suppression');
+                    clearAuthToken();
+                    setLoading(false);
+                    return;
+                }
+                
                 // Récupérer les infos utilisateur complètes depuis le backend
                 fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
                     headers: {
