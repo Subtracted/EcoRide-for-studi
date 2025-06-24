@@ -94,6 +94,74 @@
     color: #059669;
 }
 
+/* Styles pour la section paramètres */
+.settings-section {
+    padding: 1rem;
+}
+
+.settings-section h3 {
+    color: #1F2937;
+    margin-bottom: 1.5rem;
+}
+
+.settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.setting-info h4 {
+    color: #1F2937;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.setting-info p {
+    color: #6B7280;
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.setting-button {
+    background: #4F46E5;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.setting-button:hover {
+    background: #4338CA;
+}
+
+/* Responsive pour les paramètres */
+@media (max-width: 768px) {
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .setting-button {
+        width: 100%;
+    }
+}
+
 .status.annulee {
     background-color: #FEE2E2;
     color: #DC2626;

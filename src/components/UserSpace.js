@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAuthToken } from '../utils/cookies';
 import PreferencesConducteur from './PreferencesConducteur';
+import ChangePassword from './ChangePassword';
 import './UserSpace.css';
 
 const UserSpace = () => {
@@ -11,6 +12,7 @@ const UserSpace = () => {
     const [activeTab, setActiveTab] = useState('trajets');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [showChangePassword, setShowChangePassword] = useState(false);
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -74,6 +76,12 @@ const UserSpace = () => {
                     onClick={() => setActiveTab('preferences')}
                 >
                     Mes préférences conducteur
+                </button>
+                <button 
+                    className={`tab ${activeTab === 'settings' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('settings')}
+                >
+                    Paramètres
                 </button>
             </div>
 
@@ -209,7 +217,46 @@ const UserSpace = () => {
                     {activeTab === 'preferences' && (
                         <PreferencesConducteur />
                     )}
+
+                    {activeTab === 'settings' && (
+                        <div className="settings-section">
+                            <h3>Paramètres du compte</h3>
+                            <div className="settings-grid">
+                                <div className="setting-item">
+                                    <div className="setting-info">
+                                        <h4>Mot de passe</h4>
+                                        <p>Changez votre mot de passe pour sécuriser votre compte</p>
+                                    </div>
+                                    <button 
+                                        className="setting-button"
+                                        onClick={() => setShowChangePassword(true)}
+                                    >
+                                        Changer le mot de passe
+                                    </button>
+                                </div>
+                                
+                                <div className="setting-item">
+                                    <div className="setting-info">
+                                        <h4>Informations personnelles</h4>
+                                        <p>Pseudo: {user?.pseudo}</p>
+                                        <p>Email: {user?.email}</p>
+                                        <p>Crédits: {user?.credits}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
+            )}
+            
+            {showChangePassword && (
+                <ChangePassword 
+                    onClose={() => setShowChangePassword(false)}
+                    onSuccess={() => {
+                        setShowChangePassword(false);
+                        // Optionnel: rafraîchir les données utilisateur
+                    }}
+                />
             )}
         </div>
     );

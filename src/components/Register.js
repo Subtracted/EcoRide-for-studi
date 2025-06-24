@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { validatePassword, validatePasswordConfirmation, evaluatePasswordStrength } from '../utils/passwordValidation';
 import './Register.css';
 
 const Register = () => {
@@ -10,24 +11,52 @@ const Register = () => {
         pseudo: '',
         email: '',
         password: '',
+        confirmPassword: '',
         nom: '',
         prenom: '',
         telephone: ''
     });
     const [error, setError] = useState('');
+    const [passwordErrors, setPasswordErrors] = useState([]);
+    const [passwordStrength, setPasswordStrength] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
+
+        // Validation en temps réel du mot de passe
+        if (name === 'password') {
+            const validation = validatePassword(value);
+            setPasswordErrors(validation.errors);
+            
+            const strength = evaluatePasswordStrength(value);
+            setPasswordStrength(strength);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
+
+        // Validation côté client
+        const passwordValidation = validatePassword(formData.password);
+        if (!passwordValidation.isValid) {
+            setError('Mot de passe invalide : ' + passwordValidation.errors.join(', '));
+            setLoading(false);
+            return;
+        }
+
+        const confirmValidation = validatePasswordConfirmation(formData.password, formData.confirmPassword);
+        if (!confirmValidation.isValid) {
+            setError(confirmValidation.error);
+            setLoading(false);
+            return;
+        }
 
         try {
             console.log('Envoi des données:', formData); // Log pour déboguer
@@ -43,7 +72,7 @@ const Register = () => {
             console.log('Réponse du serveur:', data); // Log pour déboguer
 
             if (!response.ok) {
-                throw new Error(data.message || 'Erreur lors de l\'inscription');
+                throw new Error(data.message || data.errors?.join(', ') || 'Erreur lors de l\'inscription');
             }
 
             // Si l'inscription réussit, connecter l'utilisateur
@@ -93,6 +122,36 @@ const Register = () => {
                         id="password"
                         name="password"
                         value={formData.password}
+                        onChange={handleChange}
+                        required
+                    />
+                    {passwordStrength && (
+                        <div className={`password-strength strength-${passwordStrength.strength.toLowerCase().replace(' ', '-')}`}>
+                            <div className="strength-bar">
+                                <div 
+                                    className="strength-fill" 
+                                    style={{ width: `${(passwordStrength.score / 8) * 100}%` }}
+                                ></div>
+                            </div>
+                            <span className="strength-text">Force : {passwordStrength.strength}</span>
+                        </div>
+                    )}
+                    {passwordErrors.length > 0 && (
+                        <div className="password-errors">
+                            {passwordErrors.map((error, index) => (
+                                <div key={index} className="password-error">• {error}</div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="confirmPassword">Confirmer le mot de passe *</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
                         onChange={handleChange}
                         required
                     />

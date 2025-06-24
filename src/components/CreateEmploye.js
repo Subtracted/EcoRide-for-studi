@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './CreateEmploye.css';
 import { getAuthToken } from '../utils/cookies';
+import { validatePassword, evaluatePasswordStrength } from '../utils/passwordValidation';
 
 const CreateEmploye = ({ onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -11,18 +12,37 @@ const CreateEmploye = ({ onSuccess }) => {
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [passwordErrors, setPasswordErrors] = useState([]);
+    const [passwordStrength, setPasswordStrength] = useState(null);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
+
+        // Validation en temps réel du mot de passe
+        if (name === 'password') {
+            const validation = validatePassword(value);
+            setPasswordErrors(validation.errors);
+            
+            const strength = evaluatePasswordStrength(value);
+            setPasswordStrength(strength);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
+
+        // Validation côté client
+        const passwordValidation = validatePassword(formData.password);
+        if (!passwordValidation.isValid) {
+            setError('Mot de passe invalide : ' + passwordValidation.errors.join(', '));
+            return;
+        }
 
         try {
             const token = getAuthToken();
@@ -113,6 +133,24 @@ const CreateEmploye = ({ onSuccess }) => {
                         onChange={handleChange}
                         required
                     />
+                    {passwordStrength && (
+                        <div className={`password-strength strength-${passwordStrength.strength.toLowerCase().replace(' ', '-')}`}>
+                            <div className="strength-bar">
+                                <div 
+                                    className="strength-fill" 
+                                    style={{ width: `${(passwordStrength.score / 8) * 100}%` }}
+                                ></div>
+                            </div>
+                            <span className="strength-text">Force : {passwordStrength.strength}</span>
+                        </div>
+                    )}
+                    {passwordErrors.length > 0 && (
+                        <div className="password-errors">
+                            {passwordErrors.map((error, index) => (
+                                <div key={index} className="password-error">• {error}</div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <button type="submit" className="submit-button">
