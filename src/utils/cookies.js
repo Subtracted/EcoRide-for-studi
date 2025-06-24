@@ -54,6 +54,17 @@ export const setCookie = (name, value, options = {}) => {
     document.cookie = cookieString;
     
     console.log(`Cookie "${name}" défini avec succès`);
+    
+    // Debug en développement
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🍪 Cookie "${name}" configuré:`, {
+        maxAge: config.maxAge,
+        secure: config.secure,
+        sameSite: config.sameSite,
+        path: config.path
+      });
+    }
+    
     return true;
   } catch (error) {
     console.error(`Erreur lors de la définition du cookie "${name}":`, error);
@@ -126,10 +137,13 @@ export const hasCookie = (name) => {
 export const setAuthToken = (token, remember = false) => {
   const maxAge = remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 jours ou 24h
   
+  // Configuration adaptée à l'environnement
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   return setCookie('auth_token', token, {
     maxAge, // en secondes
-    secure: true, // HTTPS uniquement en production
-    sameSite: 'strict', // Protection CSRF
+    secure: isProduction, // HTTPS uniquement en production
+    sameSite: isProduction ? 'strict' : 'lax', // Plus permissif en dev
     httpOnly: false // Accessible via JS (nécessaire pour React)
   });
 };
@@ -139,7 +153,11 @@ export const setAuthToken = (token, remember = false) => {
  * @returns {string|null} - Token JWT ou null
  */
 export const getAuthToken = () => {
-  return getCookie('auth_token');
+  const token = getCookie('auth_token');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 Vérification token:', token ? '✅ Token trouvé' : '❌ Pas de token');
+  }
+  return token;
 };
 
 /**
