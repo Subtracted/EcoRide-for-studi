@@ -17,13 +17,42 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    // RECHERCHE DE TRAJETS
+    // RECHERCHE DE TRAJETS OU RÉCUPÉRATION D'UN TRAJET SPÉCIFIQUE
     try {
       // Vérification du token (optionnelle pour la recherche)
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
         jwt.verify(token, process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e');
+      }
+      
+      // Vérifier si c'est une requête pour un trajet spécifique (id dans l'URL)
+      const { id } = req.query;
+      
+      if (id) {
+        // Récupération d'un trajet spécifique
+        const trajetResponse = await fetch(
+          `${supabaseUrl}/rest/v1/trajets?id=eq.${id}`, 
+          {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (!trajetResponse.ok) {
+          throw new Error('Erreur lors de la récupération du trajet');
+        }
+
+        const trajets = await trajetResponse.json();
+        
+        if (trajets.length === 0) {
+          return res.status(404).json({ message: 'Trajet non trouvé' });
+        }
+
+        return res.json(trajets[0]);
       }
       
       // Récupération des paramètres de recherche
@@ -111,9 +140,38 @@ export default async function handler(req, res) {
         commentaire 
       } = req.body;
 
+      // Log des données reçues pour debug
+      console.log('Données reçues pour création trajet:', req.body);
+      console.log('User ID from token:', decoded.userId);
+
       // Validation des données
       if (!depart || !arrivee || !date_depart || !prix || !places_totales || !vehicule_id) {
+        console.log('Validation échouée:', { depart, arrivee, date_depart, prix, places_totales, vehicule_id });
         return res.status(400).json({ message: 'Tous les champs requis doivent être remplis' });
+      }
+
+      // Vérifier que le véhicule appartient bien au conducteur
+      const vehiculeResponse = await fetch(
+        `${supabaseUrl}/rest/v1/vehicules?id=eq.${vehicule_id}&conducteur_id=eq.${decoded.userId}`, 
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!vehiculeResponse.ok) {
+        console.error('Erreur vérification véhicule:', await vehiculeResponse.text());
+        throw new Error('Erreur lors de la vérification du véhicule');
+      }
+
+      const vehicules = await vehiculeResponse.json();
+      
+      if (vehicules.length === 0) {
+        console.log('Véhicule non trouvé:', vehicule_id, 'pour conducteur:', decoded.userId);
+        return res.status(400).json({ message: 'Véhicule non trouvé ou non autorisé' });
       }
 
       const insertResponse = await fetch(
