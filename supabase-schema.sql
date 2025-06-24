@@ -149,6 +149,6 @@ CREATE POLICY "Users can update their own trajets" ON public.trajets FOR UPDATE 
 
 -- Créer un utilisateur administrateur par défaut
 INSERT INTO public.utilisateurs (pseudo, email, mot_de_passe, nom, prenom, role, credits) VALUES 
-('admin', 'admin@ecoride.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'EcoRide', 'admin', 100);
+('admin', 'admin@ecoride.com', '$2a$10$WfttChmtNlH7Abse97EM2.3pf9VVeLB4LC2R1P8YVZidwI7WnkQta', 'Admin', 'EcoRide', 'admin', 100);
 
 COMMIT; 
