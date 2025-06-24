@@ -79,9 +79,9 @@ export default async function handler(req, res) {
         break;
 
       case 'reservations':
-        // Récupération des réservations de l'utilisateur
+        // Récupération des réservations de l'utilisateur avec les détails du trajet
         const reservationsResponse = await fetch(
-          `${supabaseUrl}/rest/v1/reservations?passager_id=eq.${decoded.userId}`, 
+          `${supabaseUrl}/rest/v1/reservations?passager_id=eq.${decoded.userId}&select=*,trajets(*)`, 
           {
             headers: {
               'apikey': supabaseKey,
@@ -95,8 +95,58 @@ export default async function handler(req, res) {
           throw new Error('Erreur lors de la récupération des réservations');
         }
 
-        const reservations = await reservationsResponse.json();
-        res.json(reservations);
+        const reservationsData = await reservationsResponse.json();
+        
+        // Transformer les données pour inclure les infos du trajet
+        const reservationsWithDetails = await Promise.all(reservationsData.map(async (reservation) => {
+          // Récupérer les détails du trajet
+          const trajetResponse = await fetch(
+            `${supabaseUrl}/rest/v1/trajets?id=eq.${reservation.trajet_id}`, 
+            {
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          const trajets = await trajetResponse.json();
+          const trajet = trajets[0] || {};
+
+          // Récupérer les infos du conducteur
+          const conducteurResponse = await fetch(
+            `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${trajet.conducteur_id}`, 
+            {
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          const conducteurs = await conducteurResponse.json();
+          const conducteur = conducteurs[0] || {};
+
+          return {
+            id: reservation.id,
+            trajet_id: reservation.trajet_id,
+            date_reservation: reservation.date_reservation,
+            statut: reservation.statut,
+            prix_total: reservation.prix_total,
+            // Données du trajet
+            depart: trajet.depart,
+            arrivee: trajet.arrivee,
+            date_depart: trajet.date_depart,
+            prix: trajet.prix,
+            // Données du conducteur
+            conducteur_pseudo: conducteur.pseudo || conducteur.nom || 'Conducteur inconnu'
+          };
+        }));
+
+        console.log('🔍 Réservations récupérées:', reservationsWithDetails);
+        res.json(reservationsWithDetails);
         break;
 
       case 'trajets':
