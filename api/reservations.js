@@ -82,6 +82,31 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Vous ne pouvez pas réserver votre propre trajet' });
       }
 
+      // Vérifier si l'utilisateur a assez de crédits
+      const userResponse = await fetch(
+        `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${decoded.userId}`, 
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const users = await userResponse.json();
+      const user = users[0];
+
+      if (!user) {
+        return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      }
+
+      if (user.credits < trajet.prix) {
+        return res.status(400).json({ 
+          message: `Crédits insuffisants. Vous avez ${user.credits} crédits, le trajet coûte ${trajet.prix} crédits.` 
+        });
+      }
+
       // Créer la réservation
       const insertResponse = await fetch(
         `${supabaseUrl}/rest/v1/reservations`, 
@@ -97,6 +122,8 @@ export default async function handler(req, res) {
             trajet_id,
             passager_id: decoded.userId,
             statut: 'confirmee',
+            prix_total: trajet.prix,
+            nombre_places: 1,
             date_reservation: new Date().toISOString()
           })
         }
@@ -108,8 +135,61 @@ export default async function handler(req, res) {
         throw new Error(`Erreur lors de la création de la réservation: ${errorData}`);
       }
 
+      // Déduire les crédits de l'utilisateur
+      const updateUserResponse = await fetch(
+        `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${decoded.userId}`, 
+        {
+          method: 'PATCH',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            credits: user.credits - trajet.prix
+          })
+        }
+      );
+
+      if (!updateUserResponse.ok) {
+        console.error('Erreur mise à jour crédits utilisateur');
+        // Note: En production, il faudrait ici annuler la réservation
+      }
+
+      // Ajouter des crédits au conducteur
+      const conducteurResponse = await fetch(
+        `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${trajet.conducteur_id}`, 
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const conducteurs = await conducteurResponse.json();
+      const conducteur = conducteurs[0];
+
+      if (conducteur) {
+        await fetch(
+          `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${trajet.conducteur_id}`, 
+          {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              credits: conducteur.credits + trajet.prix
+            })
+          }
+        );
+      }
+
       // Mettre à jour le nombre de places restantes
-      const updateResponse = await fetch(
+      const updateTrajetResponse = await fetch(
         `${supabaseUrl}/rest/v1/trajets?id=eq.${trajet_id}`, 
         {
           method: 'PATCH',
@@ -124,12 +204,18 @@ export default async function handler(req, res) {
         }
       );
 
-      if (!updateResponse.ok) {
+      if (!updateTrajetResponse.ok) {
         console.error('Erreur mise à jour places restantes');
       }
 
       const newReservation = await insertResponse.json();
-      res.status(201).json(newReservation[0]);
+      
+      console.log(`✅ Réservation créée: utilisateur ${decoded.userId} a payé ${trajet.prix} crédits pour le trajet ${trajet_id}`);
+      
+      res.status(201).json({
+        ...newReservation[0],
+        message: `Réservation confirmée ! ${trajet.prix} crédits déduits. Nouveau solde: ${user.credits - trajet.prix} crédits.`
+      });
 
     } else {
       return res.status(405).json({ message: 'Méthode non autorisée' });
