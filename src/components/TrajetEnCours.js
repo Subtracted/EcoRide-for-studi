@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import './TrajetEnCours.css';
 
 const TrajetEnCours = () => {
@@ -14,7 +15,7 @@ const TrajetEnCours = () => {
     useEffect(() => {
         const fetchTrajet = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = getAuthToken();
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/api/trajets/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -52,7 +53,7 @@ const TrajetEnCours = () => {
 
     const handleReservation = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             console.log('Token récupéré:', token);
 
             if (!token) {
