@@ -73,4 +73,39 @@
 
 .register-link a:hover {
     text-decoration: underline;
+}
+
+/* Styles pour la checkbox "Se souvenir de moi" */
+.checkbox-group {
+    gap: 0.75rem !important;
+}
+
+.checkbox-label {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.checkbox-text {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.checkbox-info {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    margin-left: 2.25rem;
+    line-height: 1.4;
 } 
