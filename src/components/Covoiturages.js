@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getAuthToken } from '../utils/cookies';
 import './Covoiturages.css';
 
 const Covoiturages = () => {
@@ -36,7 +37,7 @@ const Covoiturages = () => {
                 `${process.env.REACT_APP_API_URL}/api/trajets?${queryParams}`,
                 {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${getAuthToken()}`
                     }
                 }
             );
@@ -110,7 +111,7 @@ const Covoiturages = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify({ trajet_id: selectedTrajet.id })
             });
