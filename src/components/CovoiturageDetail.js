@@ -24,14 +24,11 @@ const CovoiturageDetail = () => {
 
     useEffect(() => {
         fetchTrajetDetails();
-        fetchAvis();
-    }, [id]);
-
-    useEffect(() => {
-        if (user && trajet) {
+        if (user) {
             fetchUserReservation();
         }
-    }, [user, trajet]);
+        fetchAvis();
+    }, [id, user]);
 
     const fetchTrajetDetails = async () => {
         try {
@@ -89,15 +86,9 @@ const CovoiturageDetail = () => {
                 const reservation = reservations.find(r => r.trajet_id === parseInt(id));
                 setUserReservation(reservation);
 
-                console.log('Réservation trouvée:', reservation);
-                console.log('Trajet actuel:', trajet);
-                console.log('Statut trajet:', reservation?.statut);
-                console.log('Is trajet terminé:', reservation?.statut === 'termine');
-
                 // Vérifier si le trajet est terminé et si le passager peut laisser un avis
-                if (reservation && reservation.statut === 'termine') {
-                    // Vérifier s'il existe déjà un avis pour cette réservation
-                    checkExistingAvis(reservation.id);
+                if (reservation && trajet && isTrajetTermine(trajet) && !reservation.avis_laisse) {
+                    setShowAvisForm(true);
                 }
             }
         } catch (err) {
@@ -119,21 +110,6 @@ const CovoiturageDetail = () => {
             }
         } catch (err) {
             console.error('Erreur lors de la récupération des avis:', err);
-        }
-    };
-
-    const checkExistingAvis = async (reservationId) => {
-        try {
-            console.log('Vérification avis pour réservation:', reservationId);
-            
-            // Pour l'instant, on affiche toujours le formulaire si le trajet est terminé
-            // L'utilisateur verra une erreur s'il essaie de soumettre un avis en double
-            setShowAvisForm(true);
-            console.log('Affichage du formulaire d\'avis');
-        } catch (err) {
-            console.error('Erreur lors de la vérification de l\'avis:', err);
-            // En cas d'erreur, afficher quand même le formulaire
-            setShowAvisForm(true);
         }
     };
 
@@ -332,10 +308,7 @@ const CovoiturageDetail = () => {
                     </div>
                 </div>
 
-                {trajet.commentaire && 
-                 !trajet.commentaire.includes('[DEMARRE]') && 
-                 !trajet.commentaire.includes('[TERMINE]') && 
-                 trajet.commentaire.trim() !== '...' && (
+                {trajet.commentaire && !trajet.commentaire.includes('[DEMARRE]') && !trajet.commentaire.includes('[TERMINE]') && (
                     <div className="commentaire-section">
                         <h3>Commentaire</h3>
                         <p>{trajet.commentaire}</p>
@@ -417,21 +390,12 @@ const CovoiturageDetail = () => {
                         ) : userReservation ? (
                             <div className="reservation-existante">
                                 <span>Vous avez réservé ce trajet</span>
-                                {userReservation.statut === 'termine' ? (
-                                    <button 
-                                        onClick={() => setShowAvisForm(true)}
-                                        className="btn-avis"
-                                    >
-                                        Laisser un avis
-                                    </button>
-                                ) : (
-                                    <button 
-                                        onClick={handleAnnulerReservation}
-                                        className="btn-annuler"
-                                    >
-                                        Annuler ma réservation
-                                    </button>
-                                )}
+                                <button 
+                                    onClick={handleAnnulerReservation}
+                                    className="btn-annuler"
+                                >
+                                    Annuler ma réservation
+                                </button>
                             </div>
                         ) : trajet.places_restantes > 0 ? (
                             <button onClick={handleReservation} className="btn-reserver">
