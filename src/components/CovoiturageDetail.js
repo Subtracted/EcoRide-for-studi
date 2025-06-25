@@ -12,6 +12,7 @@ const CovoiturageDetail = () => {
     const [error, setError] = useState(null);
     const [nombrePlaces, setNombrePlaces] = useState(1);
     const [reservationSuccess, setReservationSuccess] = useState(false);
+    const [avis, setAvis] = useState([]);
 
     console.log('ID du trajet:', id);
     console.log('Utilisateur connecté:', user);
@@ -38,11 +39,28 @@ const CovoiturageDetail = () => {
                 const data = await response.json();
                 console.log('Données du trajet reçues:', data);
                 setTrajet(data);
+                
+                // Récupérer les avis du conducteur
+                if (data.conducteur_id) {
+                    fetchAvis(data.conducteur_id);
+                }
             } catch (err) {
                 console.error('Erreur lors du fetch:', err);
                 setError(err.message);
             } finally {
                 setLoading(false);
+            }
+        };
+
+        const fetchAvis = async (conducteurId) => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user?type=avis&conducteurId=${conducteurId}`);
+                if (response.ok) {
+                    const avisData = await response.json();
+                    setAvis(avisData);
+                }
+            } catch (err) {
+                console.error('Erreur lors du fetch des avis:', err);
             }
         };
 
@@ -149,6 +167,29 @@ const CovoiturageDetail = () => {
                         <strong>Places disponibles :</strong> {trajet.places_restantes}/{trajet.places_totales}
                     </p>
                 </div>
+
+                {/* Section des avis */}
+                {avis.length > 0 && (
+                    <div className="avis-section">
+                        <h3>Avis sur le conducteur ({avis.length})</h3>
+                        <div className="avis-list">
+                            {avis.map((avisItem) => (
+                                <div key={avisItem.id} className="avis-item">
+                                    <div className="avis-header">
+                                        <div className="avis-note">
+                                            {'★'.repeat(avisItem.note)}{'☆'.repeat(5-avisItem.note)}
+                                        </div>
+                                        <span className="avis-auteur">par {avisItem.auteur_pseudo}</span>
+                                    </div>
+                                    <p className="avis-commentaire">{avisItem.commentaire}</p>
+                                    <span className="avis-date">
+                                        {new Date(avisItem.date_creation).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {trajet.places_restantes > 0 && user && user.id !== trajet.conducteur_id && (
                     <div className="reservation-section">
