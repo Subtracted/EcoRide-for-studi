@@ -64,7 +64,7 @@ export default async function handler(req, res) {
     }
 
   } else if (req.method === 'PUT') {
-    // Mise à jour d'un trajet
+    // Mise à jour d'un trajet (ou action démarrer/terminer)
     try {
       // Vérification du token obligatoire pour la modification
       const authHeader = req.headers.authorization;
@@ -75,6 +75,60 @@ export default async function handler(req, res) {
       const token = authHeader.substring(7);
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e');
 
+      const { action } = req.body;
+
+      // Gestion des actions spéciales (démarrer/terminer)
+      if (action && ['demarrer', 'terminer'].includes(action)) {
+        // Vérifier que l'utilisateur est le conducteur du trajet
+        const trajetResponse = await fetch(
+          `${supabaseUrl}/rest/v1/trajets?id=eq.${id}&conducteur_id=eq.${decoded.userId}`,
+          {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        const trajets = await trajetResponse.json();
+        
+        if (trajets.length === 0) {
+          return res.status(403).json({ message: 'Vous n\'êtes pas autorisé à modifier ce trajet' });
+        }
+
+        const statut = action === 'demarrer' ? 'en_cours' : 'termine';
+
+        // Mettre à jour le statut du trajet
+        const updateResponse = await fetch(
+          `${supabaseUrl}/rest/v1/trajets?id=eq.${id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              statut: statut
+            })
+          }
+        );
+
+        if (!updateResponse.ok) {
+          throw new Error('Erreur lors de la mise à jour du trajet');
+        }
+
+        const updatedTrajet = await updateResponse.json();
+
+        return res.json({
+          message: `Trajet ${action === 'demarrer' ? 'démarré' : 'terminé'} avec succès`,
+          trajet: updatedTrajet[0]
+        });
+      }
+
+      // Mise à jour normale du trajet
       const updateResponse = await fetch(
         `${supabaseUrl}/rest/v1/trajets?id=eq.${id}&conducteur_id=eq.${decoded.userId}`, 
         {
