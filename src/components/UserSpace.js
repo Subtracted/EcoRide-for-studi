@@ -143,6 +143,20 @@ const UserSpace = () => {
                                                     <i className="fas fa-comment"></i> {trajet.commentaire}
                                                 </div>
                                             )}
+                                            <div className="trajet-actions">
+                                                <button 
+                                                    onClick={() => navigate(`/trajet-en-cours/${trajet.id}`)}
+                                                    className="manage-button"
+                                                >
+                                                    Gérer le trajet
+                                                </button>
+                                                <button 
+                                                    onClick={() => navigate(`/covoiturage/${trajet.id}`)}
+                                                    className="details-button"
+                                                >
+                                                    Voir détails
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -206,6 +220,20 @@ const UserSpace = () => {
                                                         'Date inconnue'
                                                     }
                                                 </p>
+                                            </div>
+                                            <div className="reservation-actions">
+                                                <button 
+                                                    onClick={() => navigate(`/trajet-en-cours/${reservation.trajet_id}`)}
+                                                    className="action-button"
+                                                >
+                                                    Voir le trajet
+                                                </button>
+                                                <button 
+                                                    onClick={() => navigate(`/covoiturage/${reservation.trajet_id}`)}
+                                                    className="details-button"
+                                                >
+                                                    Détails
+                                                </button>
                                             </div>
                                         </div>
                                     ))}
