@@ -4,10 +4,10 @@ import './AvisForm.css';
 /**
  * Composant de formulaire d'avis
  * Permet aux utilisateurs de donner une note et un commentaire sur un trajet
- * @param {number} trajetId - ID du trajet concerné
+ * @param {number} reservationId - ID de la réservation concernée
  * @param {function} onSubmit - Callback appelé après soumission réussie
  */
-const AvisForm = ({ trajetId, onSubmit }) => {
+const AvisForm = ({ reservationId, onSubmit, onCancel }) => {
     // État local pour le formulaire
     const [formData, setFormData] = useState({
         note: 5,
@@ -17,6 +17,7 @@ const AvisForm = ({ trajetId, onSubmit }) => {
     // États pour la gestion des erreurs et succès
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     /**
      * Gère la soumission du formulaire
@@ -26,17 +27,20 @@ const AvisForm = ({ trajetId, onSubmit }) => {
         e.preventDefault();
         setError('');
         setSuccess('');
+        setIsSubmitting(true);
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/avis`, {
-                method: 'POST',
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
-                    trajetId,
-                    ...formData
+                    action: 'create_avis',
+                    reservationId,
+                    note: formData.note,
+                    commentaire: formData.commentaire
                 })
             });
 
@@ -45,17 +49,24 @@ const AvisForm = ({ trajetId, onSubmit }) => {
                 throw new Error(error.message);
             }
 
-            setSuccess('Avis envoyé avec succès ! Il sera visible après validation.');
+            const result = await response.json();
+            setSuccess(result.message);
             setFormData({ note: 5, commentaire: '' });
-            if (onSubmit) onSubmit();
+            
+            // Appeler le callback après un délai
+            setTimeout(() => {
+                if (onSubmit) onSubmit();
+            }, 2000);
         } catch (err) {
             setError(err.message || 'Erreur lors de l\'envoi de l\'avis');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
         <div className="avis-form">
-            <h3>Donner votre avis</h3>
+            <h3>Donner votre avis sur ce trajet</h3>
             
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message">{success}</div>}
@@ -70,6 +81,7 @@ const AvisForm = ({ trajetId, onSubmit }) => {
                                 type="button"
                                 className={`star ${formData.note >= note ? 'active' : ''}`}
                                 onClick={() => setFormData({ ...formData, note })}
+                                disabled={isSubmitting}
                             >
                                 ★
                             </button>
@@ -86,12 +98,30 @@ const AvisForm = ({ trajetId, onSubmit }) => {
                         minLength={10}
                         placeholder="Partagez votre expérience (minimum 10 caractères)"
                         rows={4}
+                        disabled={isSubmitting}
                     />
                 </div>
 
-                <button type="submit" className="submit-button">
-                    Envoyer l'avis
-                </button>
+                <div className="buttons">
+                    <button 
+                        type="submit" 
+                        className="submit-button"
+                        disabled={isSubmitting || formData.commentaire.length < 10}
+                    >
+                        {isSubmitting ? 'Envoi...' : 'Envoyer l\'avis'}
+                    </button>
+                    
+                    {onCancel && (
+                        <button 
+                            type="button" 
+                            className="cancel-button"
+                            onClick={onCancel}
+                            disabled={isSubmitting}
+                        >
+                            Annuler
+                        </button>
+                    )}
+                </div>
             </form>
         </div>
     );
