@@ -108,9 +108,23 @@ export default async function handler(req, res) {
           return res.status(403).json({ message: 'Vous n\'êtes pas autorisé à modifier ce trajet' });
         }
 
-        const statut = action === 'demarrer' ? 'en_cours' : 'termine';
+        // Utiliser le commentaire pour stocker le statut temporairement
+        // En production, il faudrait ajouter une colonne statut à la table
+        let updateData = {};
+        
+        if (action === 'demarrer') {
+          updateData = {
+            commentaire: `[DEMARRE]${trajets[0].commentaire || ''}`,
+            date_depart: new Date().toISOString()
+          };
+        } else if (action === 'terminer') {
+          updateData = {
+            commentaire: (trajets[0].commentaire || '').replace('[DEMARRE]', '[TERMINE]'),
+            date_arrivee: new Date().toISOString()
+          };
+        }
 
-        // Mettre à jour le statut du trajet
+        // Mettre à jour le trajet
         const updateResponse = await fetch(
           `${supabaseUrl}/rest/v1/trajets?id=eq.${id}`,
           {
@@ -121,13 +135,13 @@ export default async function handler(req, res) {
               'Content-Type': 'application/json',
               'Prefer': 'return=representation'
             },
-            body: JSON.stringify({
-              statut: statut
-            })
+            body: JSON.stringify(updateData)
           }
         );
 
         if (!updateResponse.ok) {
+          const errorText = await updateResponse.text();
+          console.error('Erreur Supabase update:', errorText);
           throw new Error('Erreur lors de la mise à jour du trajet');
         }
 
