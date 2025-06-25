@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "craco start",
+    "start": "react-scripts start",
     "server": "nodemon server.js",
-    "build": "craco build && echo 'Build completed'",
-    "test": "craco test",
+    "build": "CI=false react-scripts build && echo 'Build completed'",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:email": "node scripts/test-email.js",
     "test:mongo": "node src/tests/test-mongo.js",
-    "vercel-build": "npm run build"
+    "vercel-build": "CI=false npm run build"
   },
   "dependencies": {
     "@mui/icons-material": "^5.0.0",
@@ -34,14 +34,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@craco/craco": "^7.1.0",
-    "assert": "^2.0.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "nodemon": "^2.0.22",
-    "stream-browserify": "^3.0.0",
-    "url": "^0.11.3",
-    "util": "^0.12.5"
+    "nodemon": "^2.0.22"
   },
   "eslintConfig": {
     "extends": [
