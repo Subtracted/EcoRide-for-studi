@@ -94,6 +94,16 @@
     color: #059669;
 }
 
+.status.en_cours {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.status.termine {
+    background-color: #E0E7FF;
+    color: #6366F1;
+}
+
 /* Actions des trajets et réservations */
 .trajet-actions,
 .reservation-actions {
