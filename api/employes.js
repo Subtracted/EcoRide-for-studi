@@ -1,6 +1,45 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Fonction de validation du mot de passe côté serveur
+const validatePasswordServer = (password) => {
+  const errors = [];
+  
+  if (!password || password.length < 8) {
+    errors.push('Le mot de passe doit contenir au moins 8 caractères');
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre majuscule');
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre minuscule');
+  }
+  
+  if (!/\d/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un chiffre');
+  }
+  
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un caractère spécial');
+  }
+  
+  // Vérification des motifs interdits
+  const forbiddenPatterns = [/123456/, /password/i, /qwerty/i, /azerty/i];
+  for (const pattern of forbiddenPatterns) {
+    if (pattern.test(password)) {
+      errors.push('Le mot de passe ne doit pas contenir de séquences communes');
+      break;
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
 // Configuration Supabase
 const supabaseUrl = process.env.SUPABASE_URL || 'https://gjsaovtcamcahdfks.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdqc2FvdnRjYW1jYWhkZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTgzMDYsImV4cCI6MjA0OTU5NDMwNn0.rSO2vLnQs6VJQPEe2kJLDSjjFFsrApJ5kZl4FGYLd1I';
@@ -39,6 +78,10 @@ export default async function handler(req, res) {
     return await deleteEmploye(req, res);
   }
 
+  if (req.method === 'PUT') {
+    return await handleAvisAction(req, res);
+  }
+
   return res.status(405).json({ message: 'Méthode non autorisée' });
 }
 
@@ -68,6 +111,15 @@ async function createEmploye(req, res) {
 
     if (!nom || !prenom || !email || !password) {
       return res.status(400).json({ message: 'Tous les champs sont requis' });
+    }
+
+    // Validation du mot de passe
+    const passwordValidation = validatePasswordServer(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({ 
+        message: 'Le mot de passe ne respecte pas les critères de sécurité',
+        errors: passwordValidation.errors
+      });
     }
 
     // Vérifier si l'email existe déjà
@@ -141,8 +193,184 @@ async function createEmploye(req, res) {
   }
 }
 
+async function handleAvisAction(req, res) {
+  try {
+    const { avisId, action } = req.body;
+
+    if (!avisId || !action) {
+      return res.status(400).json({ message: 'ID de l\'avis et action requis' });
+    }
+
+    if (!['valider', 'refuser'].includes(action)) {
+      return res.status(400).json({ message: 'Action non valide (valider ou refuser)' });
+    }
+
+    const newStatut = action === 'valider' ? 'valide' : 'refuse';
+
+    // Mise à jour du statut de l'avis
+    const updateResponse = await fetch(
+      `${supabaseUrl}/rest/v1/avis?id=eq.${avisId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          statut: newStatut
+        })
+      }
+    );
+
+    if (!updateResponse.ok) {
+      throw new Error('Erreur lors de la mise à jour de l\'avis');
+    }
+
+    const updatedAvis = await updateResponse.json();
+
+    // Si l'avis est validé, mettre à jour la note moyenne du conducteur
+    if (action === 'valider' && updatedAvis.length > 0) {
+      await updateConducteurRating(updatedAvis[0]);
+    }
+
+    res.json({
+      message: `Avis ${action === 'valider' ? 'validé' : 'refusé'} avec succès`,
+      avis: updatedAvis[0]
+    });
+  } catch (err) {
+    console.error('❌ Erreur action avis:', err);
+    res.status(500).json({ message: 'Erreur serveur', error: err.message });
+  }
+}
+
+async function updateConducteurRating(avis) {
+  try {
+    // Récupérer la réservation pour trouver le conducteur
+    const reservationResponse = await fetch(
+      `${supabaseUrl}/rest/v1/reservations?id=eq.${avis.reservation_id}&select=*,trajets(conducteur_id)`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const reservations = await reservationResponse.json();
+    if (reservations.length === 0) return;
+
+    const conducteurId = reservations[0].trajets.conducteur_id;
+
+    // Récupérer tous les avis validés pour ce conducteur
+    const avisResponse = await fetch(
+      `${supabaseUrl}/rest/v1/avis?statut=eq.valide&select=note,reservations!inner(trajets!inner(conducteur_id))&reservations.trajets.conducteur_id=eq.${conducteurId}`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const avisValidated = await avisResponse.json();
+    
+    if (avisValidated.length > 0) {
+      // Calculer la note moyenne
+      const totalNotes = avisValidated.reduce((sum, avis) => sum + avis.note, 0);
+      const noteMoyenne = (totalNotes / avisValidated.length).toFixed(1);
+
+      // Mettre à jour le conducteur
+      await fetch(
+        `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${conducteurId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            note: parseFloat(noteMoyenne),
+            nombre_avis: avisValidated.length
+          })
+        }
+      );
+    }
+  } catch (err) {
+    console.error('❌ Erreur mise à jour note conducteur:', err);
+  }
+}
+
 async function getEmployes(req, res) {
   try {
+    // Vérifier si c'est une requête pour les avis
+    const { type } = req.query;
+    
+    if (type === 'avis') {
+      // Récupération des avis en attente de validation
+      const avisResponse = await fetch(
+        `${supabaseUrl}/rest/v1/avis?statut=eq.en_attente&select=*,reservations(trajet_id,passager_id,trajets(conducteur_id))`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!avisResponse.ok) {
+        throw new Error('Erreur lors de la récupération des avis');
+      }
+
+      const avis = await avisResponse.json();
+      
+      // Enrichir les données avec les informations des utilisateurs
+      const avisWithUserInfo = await Promise.all(
+        avis.map(async (avisItem) => {
+          // Récupérer les infos du passager
+          const passagerResponse = await fetch(
+            `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${avisItem.reservations.passager_id}`,
+            {
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          
+          // Récupérer les infos du conducteur
+          const conducteurResponse = await fetch(
+            `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${avisItem.reservations.trajets.conducteur_id}`,
+            {
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          const passager = await passagerResponse.json();
+          const conducteur = await conducteurResponse.json();
+
+          return {
+            ...avisItem,
+            auteur_pseudo: passager[0]?.pseudo || 'Utilisateur inconnu',
+            conducteur_pseudo: conducteur[0]?.pseudo || 'Conducteur inconnu'
+          };
+        })
+      );
+
+      return res.json(avisWithUserInfo);
+    }
+
+    // Récupération normale des employés
     const response = await fetch(
       `${supabaseUrl}/rest/v1/utilisateurs?role=eq.employe`,
       {
