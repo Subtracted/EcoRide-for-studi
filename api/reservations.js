@@ -16,6 +16,11 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Gestion spéciale pour la création d'avis
+  if (req.method === 'PUT' && req.body.action === 'create_avis') {
+    return await createAvis(req, res);
+  }
+
   try {
     // Vérification du token
     const authHeader = req.headers.authorization;
@@ -227,5 +232,103 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'Token invalide' });
     }
     res.status(500).json({ message: 'Erreur serveur' });
+  }
+}
+
+async function createAvis(req, res) {
+  try {
+    // Vérification du token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Token manquant' });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e');
+
+    const { reservationId, note, commentaire } = req.body;
+
+    if (!reservationId || !note || !commentaire) {
+      return res.status(400).json({ message: 'Tous les champs sont requis' });
+    }
+
+    if (note < 1 || note > 5) {
+      return res.status(400).json({ message: 'La note doit être entre 1 et 5' });
+    }
+
+    // Vérifier que la réservation appartient à l'utilisateur
+    const reservationResponse = await fetch(
+      `${supabaseUrl}/rest/v1/reservations?id=eq.${reservationId}&passager_id=eq.${decoded.userId}`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const reservations = await reservationResponse.json();
+    
+    if (reservations.length === 0) {
+      return res.status(404).json({ message: 'Réservation non trouvée ou non autorisée' });
+    }
+
+    // Vérifier si un avis existe déjà pour cette réservation
+    const existingAvisResponse = await fetch(
+      `${supabaseUrl}/rest/v1/avis?reservation_id=eq.${reservationId}`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const existingAvis = await existingAvisResponse.json();
+    
+    if (existingAvis.length > 0) {
+      return res.status(400).json({ message: 'Un avis a déjà été déposé pour cette réservation' });
+    }
+
+    // Créer l'avis
+    const createAvisResponse = await fetch(
+      `${supabaseUrl}/rest/v1/avis`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          reservation_id: reservationId,
+          note,
+          commentaire,
+          statut: 'en_attente',
+          date_creation: new Date().toISOString()
+        })
+      }
+    );
+
+    if (!createAvisResponse.ok) {
+      throw new Error('Erreur lors de la création de l\'avis');
+    }
+
+    const newAvis = await createAvisResponse.json();
+
+    res.json({
+      message: 'Avis créé avec succès. Il sera visible après validation par un employé.',
+      avis: newAvis[0]
+    });
+
+  } catch (err) {
+    console.error('❌ Erreur création avis:', err);
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Token invalide' });
+    }
+    res.status(500).json({ message: 'Erreur serveur', error: err.message });
   }
 } 
