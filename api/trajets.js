@@ -60,8 +60,8 @@ export default async function handler(req, res) {
       // Récupération des paramètres de recherche
       const { depart, arrivee, date, prix_max, est_ecologique } = req.query;
       
-      // Construction de l'URL de recherche Supabase
-      let searchUrl = `${supabaseUrl}/rest/v1/trajets?`;
+      // Construction de l'URL de recherche Supabase avec JOIN pour récupérer les infos du conducteur
+      let searchUrl = `${supabaseUrl}/rest/v1/trajets?select=*,conducteur:utilisateurs(id,pseudo,note,nombre_avis,photo_url)&`;
       const searchParams = [];
       
       if (depart) {
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
       
       searchUrl += searchParams.join('&');
       
-      // Récupération des trajets
+      // Récupération des trajets avec informations du conducteur
       const trajetsResponse = await fetch(searchUrl, {
         headers: {
           'apikey': supabaseKey,
@@ -108,7 +108,17 @@ export default async function handler(req, res) {
       }
 
       const trajets = await trajetsResponse.json();
-      res.json(trajets);
+      
+      // Transformer les données pour aplatir les informations du conducteur
+      const trajetsWithConducteurInfo = trajets.map(trajet => ({
+        ...trajet,
+        conducteur_pseudo: trajet.conducteur?.pseudo || 'Conducteur',
+        conducteur_note: trajet.conducteur?.note || 0,
+        conducteur_nombre_avis: trajet.conducteur?.nombre_avis || 0,
+        conducteur_photo: trajet.conducteur?.photo_url || null
+      }));
+      
+      res.json(trajetsWithConducteurInfo);
 
     } catch (err) {
       console.error('Erreur recherche trajets:', err);
