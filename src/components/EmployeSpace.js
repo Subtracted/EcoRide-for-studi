@@ -15,23 +15,17 @@ const EmployeSpace = () => {
 
     const fetchAvisEnAttente = async () => {
         try {
-            // Données factices pour la démo
-            const data = [
-                {
-                    id: 1,
-                    auteur_pseudo: 'user1',
-                    commentaire: 'Très bon conducteur, trajet agréable',
-                    note: 5,
-                    conducteur_pseudo: 'conducteur1'
-                },
-                {
-                    id: 2,
-                    auteur_pseudo: 'user2',
-                    commentaire: 'Ponctuel et courtois',
-                    note: 4,
-                    conducteur_pseudo: 'conducteur2'
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employes?type=avis`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
-            ];
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération des avis');
+            }
+
+            const data = await response.json();
             setAvisEnAttente(data);
         } catch (err) {
             console.error('Erreur:', err);
@@ -78,11 +72,30 @@ const EmployeSpace = () => {
 
     const handleAvisAction = async (avisId, action) => {
         try {
-            console.log(`${action} avis ${avisId}`);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employes`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    avisId,
+                    action
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la validation de l\'avis');
+            }
+
+            const result = await response.json();
+            console.log(result.message);
+            
             // Retirer l'avis de la liste après action
             setAvisEnAttente(avisEnAttente.filter(avis => avis.id !== avisId));
         } catch (err) {
             console.error('Erreur:', err);
+            alert('Erreur lors de la validation de l\'avis');
         }
     };
 
