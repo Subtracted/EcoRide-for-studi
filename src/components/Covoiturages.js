@@ -241,14 +241,40 @@ const Covoiturages = () => {
                                         minute: '2-digit'
                                     })}
                                 </p>
-                                <p>
-                                    <i className="fas fa-user"></i>
-                                    {trajet.conducteur_pseudo}
-                                </p>
+                                <div className="conducteur-info">
+                                    <div className="conducteur-details">
+                                        <p>
+                                            <i className="fas fa-user"></i>
+                                            {trajet.conducteur_pseudo}
+                                        </p>
+                                        {trajet.conducteur_note > 0 && (
+                                            <p className="conducteur-note">
+                                                <i className="fas fa-star"></i>
+                                                {trajet.conducteur_note}/5
+                                                {trajet.conducteur_nombre_avis > 0 && (
+                                                    <span className="nb-avis">({trajet.conducteur_nombre_avis} avis)</span>
+                                                )}
+                                            </p>
+                                        )}
+                                    </div>
+                                    {trajet.conducteur_photo && (
+                                        <img 
+                                            src={trajet.conducteur_photo} 
+                                            alt={trajet.conducteur_pseudo}
+                                            className="conducteur-avatar"
+                                        />
+                                    )}
+                                </div>
                                 <p>
                                     <i className="fas fa-euro-sign"></i>
                                     {trajet.prix} crédits
                                 </p>
+                                {trajet.est_ecologique && (
+                                    <p className="ecologique">
+                                        <i className="fas fa-leaf"></i>
+                                        Voyage écologique
+                                    </p>
+                                )}
                             </div>
                             {trajet.commentaire && (
                                 <div className="trajet-commentaire">
