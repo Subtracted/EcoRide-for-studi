@@ -174,19 +174,30 @@ export default async function handler(req, res) {
           const conducteurs = await conducteurResponse.json();
           const conducteur = conducteurs[0] || {};
 
+          // Déterminer le vrai statut basé sur l'état du trajet
+          let vraStatut = reservation.statut;
+          if (trajet.commentaire?.includes('[DEMARRE]')) {
+            vraStatut = 'en_cours';
+          } else if (trajet.commentaire?.includes('[TERMINE]')) {
+            vraStatut = 'termine';
+          }
+
           return {
             id: reservation.id,
             trajet_id: reservation.trajet_id,
             date_reservation: reservation.date_reservation,
-            statut: reservation.statut,
+            statut: vraStatut,
             prix_total: reservation.prix_total,
             // Données du trajet
             depart: trajet.depart,
             arrivee: trajet.arrivee,
             date_depart: trajet.date_depart,
+            date_arrivee: trajet.date_arrivee,
             prix: trajet.prix,
+            commentaire: trajet.commentaire,
             // Données du conducteur
-            conducteur_pseudo: conducteur.pseudo || conducteur.nom || 'Conducteur inconnu'
+            conducteur_pseudo: conducteur.pseudo || conducteur.nom || 'Conducteur inconnu',
+            conducteur_id: trajet.conducteur_id
           };
         }));
 
