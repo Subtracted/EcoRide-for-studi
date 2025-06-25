@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getAuthToken } from '../utils/cookies';
 import './EmployeSpace.css';
 
 const EmployeSpace = () => {
@@ -17,7 +18,7 @@ const EmployeSpace = () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employes?type=avis`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 }
             });
 
@@ -76,7 +77,7 @@ const EmployeSpace = () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${getAuthToken()}`
                 },
                 body: JSON.stringify({
                     avisId,
