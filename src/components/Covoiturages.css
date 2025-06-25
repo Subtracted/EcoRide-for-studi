@@ -886,4 +886,77 @@
     .covoiturage-card {
         padding: 1rem;
     }
+}
+
+/* Styles pour les informations du conducteur */
+.conducteur-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+}
+
+.conducteur-details {
+    flex: 1;
+}
+
+.conducteur-details p {
+    margin: 0.25rem 0;
+}
+
+.conducteur-note {
+    color: #f59e0b;
+    font-weight: 500;
+}
+
+.conducteur-note .fas.fa-star {
+    color: #fbbf24;
+    margin-right: 0.25rem;
+}
+
+.nb-avis {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-left: 0.25rem;
+}
+
+.conducteur-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    margin-left: 1rem;
+}
+
+.ecologique {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.ecologique .fas.fa-leaf {
+    color: #10b981;
+    margin-right: 0.25rem;
+}
+
+/* Amélioration des styles existants pour la note */
+.trajet-card .conducteur-note {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+@media (max-width: 640px) {
+    .conducteur-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .conducteur-avatar {
+        margin: 0;
+    }
 } 
