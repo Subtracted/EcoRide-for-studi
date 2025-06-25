@@ -256,4 +256,279 @@
 .avis-date {
     font-size: 0.8rem;
     color: #999;
+}
+
+/* Styles pour le mode gestion */
+.gestion-badge {
+    background: linear-gradient(to right, #10b981, #059669);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.gestion-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.statut-trajet {
+    margin-bottom: 1.5rem;
+}
+
+.statut-attente, .statut-en-cours, .statut-termine {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+}
+
+.statut-attente {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+}
+
+.statut-en-cours {
+    background: #dcfce7;
+    border: 1px solid #22c55e;
+}
+
+.statut-termine {
+    background: #e0e7ff;
+    border: 1px solid #6366f1;
+}
+
+.btn-demarrer, .btn-terminer {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-demarrer:hover, .btn-terminer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.btn-terminer {
+    background: linear-gradient(to right, #f59e0b, #d97706);
+}
+
+.btn-terminer:hover {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.info-avis {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-left: 0.5rem;
+}
+
+.reservations-conducteur {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.passagers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.passager-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+}
+
+.passager-nom {
+    font-weight: 500;
+}
+
+.reservation-statut {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.reservation-statut.confirmee {
+    background: #dcfce7;
+    color: #059669;
+}
+
+.actions-section {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.btn-login, .btn-gerer, .btn-reserver, .btn-annuler {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-login:hover, .btn-gerer:hover, .btn-reserver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.btn-annuler {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    margin-left: 1rem;
+}
+
+.btn-annuler:hover {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.reservation-existante {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.reservation-existante span {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.complet {
+    padding: 1rem;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.label {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.value {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.value.eco {
+    color: var(--primary-color);
+}
+
+.conducteur-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.conducteur-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+}
+
+.note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.etoiles {
+    color: #fbbf24;
+    font-size: 1.2rem;
+}
+
+.note-valeur {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.nb-avis {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .detail-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .gestion-section {
+        padding: 1rem;
+    }
+    
+    .statut-attente, .statut-en-cours, .statut-termine {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .reservation-existante {
+        text-align: center;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .conducteur-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
 } 
