@@ -31,9 +31,9 @@ export default async function handler(req, res) {
         jwt.verify(token, process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e');
       }
 
-      // Récupération du trajet spécifique
+      // Récupération du trajet spécifique avec les informations du conducteur
       const trajetResponse = await fetch(
-        `${supabaseUrl}/rest/v1/trajets?id=eq.${id}`, 
+        `${supabaseUrl}/rest/v1/trajets?id=eq.${id}&select=*,conducteur:utilisateurs(id,pseudo,note,nombre_avis,photo_url)`, 
         {
           headers: {
             'apikey': supabaseKey,
@@ -53,7 +53,18 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: 'Trajet non trouvé' });
       }
 
-      res.json(trajets[0]);
+      const trajet = trajets[0];
+      
+      // Transformer les données pour aplatir les informations du conducteur
+      const trajetWithConducteurInfo = {
+        ...trajet,
+        conducteur_pseudo: trajet.conducteur?.pseudo || 'Conducteur',
+        conducteur_note: trajet.conducteur?.note || 0,
+        conducteur_nombre_avis: trajet.conducteur?.nombre_avis || 0,
+        conducteur_photo: trajet.conducteur?.photo_url || null
+      };
+
+      res.json(trajetWithConducteurInfo);
 
     } catch (err) {
       console.error('Erreur récupération trajet:', err);
