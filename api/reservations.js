@@ -222,6 +222,86 @@ export default async function handler(req, res) {
         message: `Réservation confirmée ! ${trajet.prix} crédits déduits. Nouveau solde: ${user.credits - trajet.prix} crédits.`
       });
 
+    } else if (req.method === 'DELETE') {
+      // ANNULATION DE RÉSERVATION
+      const { reservation_id } = req.body;
+
+      if (!reservation_id) {
+        return res.status(400).json({ message: 'ID de réservation requis' });
+      }
+
+      // Vérifier que la réservation appartient à l'utilisateur
+      const checkResponse = await fetch(
+        `${supabaseUrl}/rest/v1/reservations?id=eq.${reservation_id}&passager_id=eq.${decoded.userId}`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const reservations = await checkResponse.json();
+      
+      if (reservations.length === 0) {
+        return res.status(404).json({ message: 'Réservation non trouvée ou non autorisée' });
+      }
+
+      const reservation = reservations[0];
+
+      // Récupérer les infos du trajet pour remettre les places
+      const trajetResponse = await fetch(
+        `${supabaseUrl}/rest/v1/trajets?id=eq.${reservation.trajet_id}`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const trajets = await trajetResponse.json();
+      const trajet = trajets[0];
+
+      // Supprimer la réservation
+      const deleteResponse = await fetch(
+        `${supabaseUrl}/rest/v1/reservations?id=eq.${reservation_id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!deleteResponse.ok) {
+        throw new Error('Erreur lors de la suppression de la réservation');
+      }
+
+      // Remettre les places disponibles dans le trajet
+      if (trajet) {
+        await fetch(
+          `${supabaseUrl}/rest/v1/trajets?id=eq.${reservation.trajet_id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              places_restantes: trajet.places_restantes + 1
+            })
+          }
+        );
+      }
+
+      res.json({ message: 'Réservation annulée avec succès' });
+
     } else {
       return res.status(405).json({ message: 'Méthode non autorisée' });
     }
