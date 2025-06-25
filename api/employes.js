@@ -308,7 +308,32 @@ async function updateConducteurRating(avis) {
 async function getEmployes(req, res) {
   try {
     // Vérifier si c'est une requête pour les avis
-    const { type } = req.query;
+    const { type, reservationId } = req.query;
+    
+    if (type === 'check_avis') {
+      // Vérifier si un avis existe pour une réservation
+      const avisResponse = await fetch(
+        `${supabaseUrl}/rest/v1/avis?reservation_id=eq.${reservationId}`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!avisResponse.ok) {
+        throw new Error('Erreur lors de la vérification de l\'avis');
+      }
+
+      const avis = await avisResponse.json();
+      
+      return res.json({
+        hasAvis: avis.length > 0,
+        avis: avis[0] || null
+      });
+    }
     
     if (type === 'avis') {
       // Récupération des avis en attente de validation
