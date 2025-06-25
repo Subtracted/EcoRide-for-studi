@@ -237,6 +237,60 @@ export default async function handler(req, res) {
         res.json(vehicules);
         break;
 
+      case 'avis':
+        // Récupération des avis validés pour un conducteur spécifique
+        const { conducteurId } = req.query;
+        
+        if (!conducteurId) {
+          return res.status(400).json({ message: 'ID du conducteur requis' });
+        }
+
+        const avisResponse = await fetch(
+          `${supabaseUrl}/rest/v1/avis?statut=eq.valide&select=*,reservations!inner(trajets!inner(conducteur_id))&reservations.trajets.conducteur_id=eq.${conducteurId}`,
+          {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (!avisResponse.ok) {
+          throw new Error('Erreur lors de la récupération des avis');
+        }
+
+        const avisData = await avisResponse.json();
+        
+        // Enrichir avec les infos des passagers
+        const avisWithPassagerInfo = await Promise.all(
+          avisData.map(async (avis) => {
+            const passagerResponse = await fetch(
+              `${supabaseUrl}/rest/v1/utilisateurs?id=eq.${avis.reservations.passager_id}`,
+              {
+                headers: {
+                  'apikey': supabaseKey,
+                  'Authorization': `Bearer ${supabaseKey}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+            
+            const passager = await passagerResponse.json();
+            
+            return {
+              id: avis.id,
+              note: avis.note,
+              commentaire: avis.commentaire,
+              date_creation: avis.date_creation,
+              auteur_pseudo: passager[0]?.pseudo || 'Utilisateur'
+            };
+          })
+        );
+
+        res.json(avisWithPassagerInfo);
+        break;
+
       default:
         return res.status(400).json({ message: 'Type de données non spécifié. Utilisez ?type=profile|reservations|trajets|vehicules' });
     }
