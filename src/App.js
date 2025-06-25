@@ -64,6 +64,7 @@ function App() {
                             } 
                         />
                         <Route path="/covoiturage/:id" element={<TrajetEnCours />} />
+                        <Route path="/trajet-en-cours/:id" element={<TrajetEnCours />} />
                         
                         {/* Pages légales */}
                         <Route path="/mentions-legales" element={<MentionsLegales />} />
