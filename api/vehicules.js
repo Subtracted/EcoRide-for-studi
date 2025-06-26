@@ -28,6 +28,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       // Récupération des véhicules
+      console.log(`Récupération des véhicules pour l'utilisateur ${decoded.userId}`);
+      
       const vehiculesResponse = await fetch(
         `${supabaseUrl}/rest/v1/vehicules?conducteur_id=eq.${decoded.userId}`, 
         {
@@ -40,10 +42,13 @@ export default async function handler(req, res) {
       );
 
       if (!vehiculesResponse.ok) {
+        const errorText = await vehiculesResponse.text();
+        console.error('Erreur Supabase véhicules:', errorText);
         throw new Error('Erreur lors de la récupération des véhicules');
       }
 
       const vehicules = await vehiculesResponse.json();
+      console.log(`Véhicules trouvés:`, vehicules);
       res.json(vehicules);
 
     } else if (req.method === 'POST') {
