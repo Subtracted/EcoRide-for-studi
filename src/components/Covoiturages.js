@@ -60,17 +60,45 @@ const Covoiturages = () => {
         fetchTrajets();
     }, []);
 
+    // Auto-clear des messages
+    useEffect(() => {
+        if (message || error) {
+            const timer = setTimeout(() => {
+                setMessage('');
+                setError('');
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [message, error]);
+
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchTrajets(searchParams);
+        const params = {};
+        searchParams.forEach((value, key) => {
+            if (value && value !== 'false') {
+                params[key] = value;
+            }
+        });
+        fetchTrajets(params);
     };
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setSearchParams(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (type === 'checkbox') {
+            if (checked) {
+                newSearchParams.set(name, 'true');
+            } else {
+                newSearchParams.delete(name);
+            }
+        } else {
+            if (value) {
+                newSearchParams.set(name, value);
+            } else {
+                newSearchParams.delete(name);
+            }
+        }
+        setSearchParams(newSearchParams);
     };
 
     const handleFiltreChange = (e) => {
@@ -147,6 +175,9 @@ const Covoiturages = () => {
     return (
         <div className="covoiturages-container">
             <h2>Rechercher un trajet</h2>
+
+            {message && <div className="message success">{message}</div>}
+            {error && <div className="message error">{error}</div>}
 
             <form onSubmit={handleSearch} className="search-form">
                 <div className="form-row">
@@ -281,12 +312,35 @@ const Covoiturages = () => {
                                     <i className="fas fa-comment"></i> {trajet.commentaire}
                                 </div>
                             )}
-                            <button 
-                                onClick={() => navigate(`/covoiturage/${trajet.id}`)}
-                                className="details-button"
-                            >
-                                Voir les détails
-                            </button>
+                            <div className="trajet-actions">
+                                <button 
+                                    onClick={() => navigate(`/covoiturage/${trajet.id}`)}
+                                    className="details-button"
+                                >
+                                    Voir les détails
+                                </button>
+                                {user && trajet.places_restantes > 0 && trajet.conducteur_id !== user.id && (
+                                    <button 
+                                        onClick={() => handleReservation(trajet)}
+                                        className="reserve-button"
+                                    >
+                                        Réserver
+                                    </button>
+                                )}
+                                {!user && trajet.places_restantes > 0 && (
+                                    <button 
+                                        onClick={() => navigate('/login')}
+                                        className="login-button"
+                                    >
+                                        Se connecter pour réserver
+                                    </button>
+                                )}
+                                {trajet.places_restantes === 0 && (
+                                    <button className="complet-button" disabled>
+                                        Complet
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -298,7 +352,7 @@ const Covoiturages = () => {
                         <h3>Confirmer la réservation</h3>
                         <p>Trajet : {selectedTrajet.depart} → {selectedTrajet.arrivee}</p>
                         <p>Date : {new Date(selectedTrajet.date_depart).toLocaleString()}</p>
-                        <p>Prix : {selectedTrajet.prix}€</p>
+                        <p>Prix : {selectedTrajet.prix} crédits</p>
                         <p>Voulez-vous vraiment réserver ce trajet ?</p>
                         <div className="confirmation-buttons">
                             <button onClick={confirmReservation} className="confirm-button">
