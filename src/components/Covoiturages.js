@@ -47,7 +47,9 @@ const Covoiturages = () => {
             }
 
             const data = await response.json();
-            setTrajets(data);
+            console.log('Données reçues de l\'API:', data);
+            // S'assurer que data est un tableau
+            setTrajets(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Erreur:', err);
             setError('Impossible de charger les trajets');
@@ -110,6 +112,12 @@ const Covoiturages = () => {
     };
 
     const filtrerTrajets = (trajets) => {
+        // Vérifier que trajets est bien un tableau
+        if (!Array.isArray(trajets)) {
+            console.error('filtrerTrajets: trajets n\'est pas un tableau:', trajets);
+            return [];
+        }
+        
         return trajets.filter(trajet => {
             if (filtres.estEcologique && !trajet.est_ecologique) return false;
             if (filtres.prixMax && trajet.prix > parseInt(filtres.prixMax)) return false;
@@ -134,6 +142,12 @@ const Covoiturages = () => {
     };
 
     const confirmReservation = async () => {
+        if (!selectedTrajet) {
+            setError('Aucun trajet sélectionné');
+            setShowConfirmation(false);
+            return;
+        }
+
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations`, {
                 method: 'POST',
@@ -149,23 +163,24 @@ const Covoiturages = () => {
             if (response.ok) {
                 setMessage('Réservation effectuée avec succès !');
                 // Rafraîchir les trajets
+                const params = {};
+                if (searchParams.get('depart')) params.depart = searchParams.get('depart');
+                if (searchParams.get('arrivee')) params.arrivee = searchParams.get('arrivee');
+                if (searchParams.get('date')) params.date = searchParams.get('date');
+                if (searchParams.get('prix_max')) params.prix_max = searchParams.get('prix_max');
+                if (searchParams.get('est_ecologique')) params.est_ecologique = searchParams.get('est_ecologique');
+                
                 const updatedResponse = await fetch(
-                    `${process.env.REACT_APP_API_URL}/api/trajets?` + 
-                    new URLSearchParams({
-                        depart: searchParams.get('depart'),
-                        arrivee: searchParams.get('arrivee'),
-                        date: searchParams.get('date'),
-                        prix_max: searchParams.get('prix_max'),
-                        est_ecologique: searchParams.get('est_ecologique')
-                    })
+                    `${process.env.REACT_APP_API_URL}/api/trajets?` + new URLSearchParams(params)
                 );
                 const updatedData = await updatedResponse.json();
-                setTrajets(updatedData);
+                setTrajets(Array.isArray(updatedData) ? updatedData : []);
             } else {
-                setMessage(data.message || 'Erreur lors de la réservation');
+                setError(data.message || 'Erreur lors de la réservation');
             }
         } catch (err) {
-            setMessage('Erreur de connexion au serveur');
+            console.error('Erreur lors de la réservation:', err);
+            setError('Erreur de connexion au serveur');
         } finally {
             setShowConfirmation(false);
             setSelectedTrajet(null);
@@ -248,11 +263,11 @@ const Covoiturages = () => {
                 <div className="loading">Chargement...</div>
             ) : error ? (
                 <div className="error">{error}</div>
-            ) : trajetsFiltres.length === 0 ? (
+            ) : !Array.isArray(trajetsFiltres) || trajetsFiltres.length === 0 ? (
                 <div className="no-results">Aucun trajet trouvé</div>
             ) : (
                 <div className="trajets-grid">
-                    {trajetsFiltres.map(trajet => (
+                    {trajetsFiltres.filter(trajet => trajet && trajet.id).map(trajet => (
                         <div key={trajet.id} className="trajet-card">
                             <div className="trajet-header">
                                 <h4>{trajet.depart} → {trajet.arrivee}</h4>
