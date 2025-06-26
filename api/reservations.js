@@ -25,11 +25,14 @@ export default async function handler(req, res) {
     // Vérification du token
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Token manquant dans la requête');
       return res.status(401).json({ message: 'Token manquant' });
     }
 
     const token = authHeader.substring(7);
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'e66d2fa269a4be0d77b83d474ca7e');
+    
+    console.log(`Requête ${req.method} de l'utilisateur ${decoded.userId}:`, req.body);
 
     if (req.method === 'GET') {
       // Récupération des réservations de l'utilisateur
