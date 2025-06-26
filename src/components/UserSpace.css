@@ -94,22 +94,11 @@
     color: #059669;
 }
 
-.status.en_cours {
-    background-color: #FEF3C7;
-    color: #D97706;
-}
-
-.status.termine {
-    background-color: #E0E7FF;
-    color: #6366F1;
-}
-
 /* Actions des trajets et réservations */
-.trajet-actions,
-.reservation-actions {
+.trajet-actions {
     display: flex;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid #e2e8f0;
 }
@@ -151,8 +140,7 @@
 }
 
 @media (max-width: 768px) {
-    .trajet-actions,
-    .reservation-actions {
+    .trajet-actions {
         flex-direction: column;
     }
 }
@@ -577,6 +565,9 @@
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
 }
 
 .trajet-card:hover {
@@ -613,6 +604,7 @@
 .trajet-details {
     display: grid;
     gap: 10px;
+    flex: 1;
 }
 
 .trajet-details p {
@@ -723,6 +715,9 @@
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
 }
 
 .reservation-card:hover {
@@ -748,6 +743,7 @@
 .reservation-details {
     display: grid;
     gap: 10px;
+    flex: 1;
 }
 
 .reservation-details p {
@@ -767,6 +763,35 @@
     background: #f6ffed;
     color: #52c41a;
     border: 1px solid #b7eb8f;
+}
+
+/* Amélioration des actions des réservations */
+.reservation-actions {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    justify-content: stretch;
+}
+
+.reservation-actions button {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 640px) {
+    .reservation-actions {
+        flex-direction: column;
+    }
+    
+    .reservation-actions button {
+        width: 100%;
+    }
 }
 
 /* Version mobile */ 
