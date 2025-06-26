@@ -33,22 +33,30 @@ const SaisirVoyage = () => {
             return;
         }
 
+        console.log('Utilisateur connecté:', user);
+
         const fetchVehicules = async () => {
             try {
-                            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
-                headers: {
-                    'Authorization': `Bearer ${getAuthToken()}`
-                }
-            });
+                console.log('Récupération des véhicules...');
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vehicules`, {
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+                
+                console.log('Response status:', response.status);
                 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Erreur response:', errorText);
                     throw new Error('Erreur chargement véhicules');
                 }
                 
                 const data = await response.json();
+                console.log('Véhicules reçus:', data);
                 setVehicules(data);
             } catch (err) {
-                console.error('Erreur:', err);
+                console.error('Erreur fetch véhicules:', err);
                 setError('Impossible de charger vos véhicules');
             } finally {
                 setLoading(false);
@@ -253,19 +261,38 @@ const SaisirVoyage = () => {
 
                 <div className="form-group">
                     <label>Véhicule</label>
-                    <select
-                        name="vehicule_id"
-                        value={formData.vehicule_id}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="">Sélectionnez un véhicule</option>
-                        {vehicules.map(vehicule => (
-                            <option key={vehicule.id} value={vehicule.id}>
-                                {vehicule.marque} {vehicule.modele} ({vehicule.annee})
-                            </option>
-                        ))}
-                    </select>
+                    {loading ? (
+                        <p>Chargement des véhicules...</p>
+                    ) : vehicules.length === 0 ? (
+                        <div>
+                            <p>Aucun véhicule trouvé. Vous devez d'abord ajouter un véhicule.</p>
+                            <button 
+                                type="button" 
+                                onClick={() => navigate('/mon-espace')}
+                                className="add-vehicle-button"
+                            >
+                                Ajouter un véhicule
+                            </button>
+                        </div>
+                    ) : (
+                        <select
+                            name="vehicule_id"
+                            value={formData.vehicule_id}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Sélectionnez un véhicule</option>
+                            {vehicules.map(vehicule => (
+                                <option key={vehicule.id} value={vehicule.id}>
+                                    {vehicule.marque} {vehicule.modele} ({vehicule.annee})
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                    {/* Debug info */}
+                    <div style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
+                        Debug: {vehicules.length} véhicule(s) trouvé(s)
+                    </div>
                 </div>
 
                 <div className="form-group checkbox">
