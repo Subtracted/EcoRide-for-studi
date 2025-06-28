@@ -9,17 +9,17 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = getAuthToken();
-        console.log('🔄 AuthContext useEffect - Token trouvé:', !!token);
+        console.log('AuthContext: Token trouvé:', !!token);
         
         if (token) {
             try {
                 const decoded = JSON.parse(atob(token.split('.')[1]));
-                console.log('🔓 Token décodé, expiration:', new Date(decoded.exp * 1000));
+                console.log('Token décodé, expiration:', new Date(decoded.exp * 1000));
                 
                 // Vérifier si le token n'est pas expiré
                 const now = Date.now() / 1000;
                 if (decoded.exp < now) {
-                    console.log('⏰ Token expiré, suppression');
+                    console.log('Token expiré, suppression');
                     clearAuthToken();
                     setLoading(false);
                     return;
@@ -61,7 +61,7 @@ const AuthProvider = ({ children }) => {
 
     const login = async (credentials, rememberMe = false) => {
         try {
-            console.log('🔐 Tentative de connexion pour:', credentials.email);
+            console.log('Login attempt for:', credentials.email);
 
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
                 method: 'POST',
@@ -76,7 +76,7 @@ const AuthProvider = ({ children }) => {
             if (response.ok) {
                 setAuthToken(data.token, rememberMe);
                 setUser(data.user);
-                console.log(`Connexion réussie - Se souvenir: ${rememberMe ? 'Oui (30 jours)' : 'Non (24h)'}`);
+                console.log(`Login successful - Remember: ${rememberMe ? 'Yes (30 days)' : 'No (24h)'}`);
                 return { success: true };
             } else {
                 throw new Error(data.message);
@@ -90,12 +90,12 @@ const AuthProvider = ({ children }) => {
     const logout = () => {
         clearAuthToken();
         setUser(null);
-        console.log('Déconnexion réussie - Cookie supprimé');
+        console.log('Logout successful - Cookie cleared');
     };
 
     const register = async (user, token, rememberMe = false) => {
         try {
-            console.log('✅ Enregistrement utilisateur:', user.email || 'Utilisateur');
+            console.log('User registered:', user.email || 'User');
             setAuthToken(token, rememberMe);
             setUser(user);
             console.log('Utilisateur enregistré avec succès');
