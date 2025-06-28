@@ -1,6 +1,45 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Fonction de validation du mot de passe côté serveur
+const validatePasswordServer = (password) => {
+  const errors = [];
+  
+  if (!password || password.length < 8) {
+    errors.push('Le mot de passe doit contenir au moins 8 caractères');
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre majuscule');
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre minuscule');
+  }
+  
+  if (!/\d/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un chiffre');
+  }
+  
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un caractère spécial');
+  }
+  
+  // Vérification des motifs interdits
+  const forbiddenPatterns = [/123456/, /password/i, /qwerty/i, /azerty/i];
+  for (const pattern of forbiddenPatterns) {
+    if (pattern.test(password)) {
+      errors.push('Le mot de passe ne doit pas contenir de séquences communes');
+      break;
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
 // Configuration Supabase
 const supabaseUrl = process.env.SUPABASE_URL || 'https://gjsaovtcamcahdfks.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdqc2FvdnRjYW1jYWhkZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTgzMDYsImV4cCI6MjA0OTU5NDMwNn0.rSO2vLnQs6VJQPEe2kJLDSjjFFsrApJ5kZl4FGYLd1I';
@@ -23,7 +62,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Données reçues:', req.body);
+    console.log('📝 Inscription demandée pour:', req.body.email);
 
     const { 
       pseudo, 
@@ -45,6 +84,15 @@ export default async function handler(req, res) {
           nom: !nom ? 'Nom requis' : null,
           prenom: !prenom ? 'Prénom requis' : null
         }
+      });
+    }
+
+    // Validation du mot de passe
+    const passwordValidation = validatePasswordServer(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({ 
+        message: 'Le mot de passe ne respecte pas les critères de sécurité',
+        errors: passwordValidation.errors
       });
     }
 
