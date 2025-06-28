@@ -61,7 +61,7 @@ const AuthProvider = ({ children }) => {
 
     const login = async (credentials, rememberMe = false) => {
         try {
-            console.log('Données envoyées:', credentials); // Debug
+            console.log('🔐 Tentative de connexion pour:', credentials.email);
 
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
                 method: 'POST',
@@ -95,7 +95,7 @@ const AuthProvider = ({ children }) => {
 
     const register = async (user, token, rememberMe = false) => {
         try {
-            console.log('Tentative d\'enregistrement:', { user, token });
+            console.log('✅ Enregistrement utilisateur:', user.email || 'Utilisateur');
             setAuthToken(token, rememberMe);
             setUser(user);
             console.log('Utilisateur enregistré avec succès');
