@@ -62,7 +62,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('📝 Inscription demandée pour:', req.body.email);
+    console.log('Registration requested for:', req.body.email);
 
     const { 
       pseudo, 
