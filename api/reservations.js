@@ -218,7 +218,7 @@ export default async function handler(req, res) {
 
       const newReservation = await insertResponse.json();
       
-      console.log(`✅ Réservation créée: utilisateur ${decoded.userId} a payé ${trajet.prix} crédits pour le trajet ${trajet_id}`);
+      console.log(`Reservation created: user ${decoded.userId} paid ${trajet.prix} credits for trip ${trajet_id}`);
       
       res.status(201).json({
         ...newReservation[0],
