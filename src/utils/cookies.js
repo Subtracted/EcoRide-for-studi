@@ -155,7 +155,7 @@ export const setAuthToken = (token, remember = false) => {
 export const getAuthToken = () => {
   const token = getCookie('auth_token');
   if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 Vérification token:', token ? '✅ Token trouvé' : '❌ Pas de token');
+    console.log('Token check:', token ? 'Token found' : 'No token');
   }
   return token;
 };
