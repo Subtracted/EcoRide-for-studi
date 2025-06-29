@@ -178,7 +178,7 @@ const CreerTrajet = () => {
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="prix">Prix par passager (€)</label>
+                        <label htmlFor="prix">Prix par passager (crédits)</label>
                         <input
                             type="number"
                             id="prix"
