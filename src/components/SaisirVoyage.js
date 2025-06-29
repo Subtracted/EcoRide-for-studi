@@ -221,24 +221,24 @@ const SaisirVoyage = () => {
                                     value={prix}
                                     onChange={(e) => setPrix(Number(e.target.value))}
                                 />
-                                <span className="currency">€</span>
+                                <span className="currency">crédits</span>
                             </div>
                             <div className="prix-details">
                                 <div className="detail-item">
                                     <span>Prix pour les passagers :</span>
-                                    <span className="montant">{prix + COMMISSION_PLATEFORME}€</span>
+                                    <span className="montant">{prix + COMMISSION_PLATEFORME} crédits</span>
                                 </div>
                                 <div className="detail-item">
                                     <span>Commission plateforme :</span>
-                                    <span className="montant">{COMMISSION_PLATEFORME}€</span>
+                                    <span className="montant">{COMMISSION_PLATEFORME} crédits</span>
                                 </div>
                                 <div className="detail-item total">
                                     <span>Vous recevrez :</span>
-                                    <span className="montant">{prix}€</span>
+                                    <span className="montant">{prix} crédits</span>
                                 </div>
                             </div>
                             <p className="prix-info">
-                                Une commission de {COMMISSION_PLATEFORME}€ est appliquée par la plateforme pour garantir 
+                                Une commission de {COMMISSION_PLATEFORME} crédits est appliquée par la plateforme pour garantir 
                                 le bon fonctionnement du service. Cette commission est ajoutée au prix que vous définissez 
                                 et sera payée par le passager.
                             </p>
