@@ -221,7 +221,6 @@ const SaisirVoyage = () => {
                                     value={prix}
                                     onChange={(e) => setPrix(Number(e.target.value))}
                                 />
-                                <span className="currency">crédits</span>
                             </div>
                             <div className="prix-details">
                                 <div className="detail-item">
