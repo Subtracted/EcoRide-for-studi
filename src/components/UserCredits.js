@@ -49,7 +49,6 @@ const UserCredits = () => {
                 <h3>Vos crédits :</h3>
                 <div className="credits-amount">
                     <span className="amount">{user?.credits || 0}</span>
-                    <span className="label">€</span>
                 </div>
             </div>
             <button 
